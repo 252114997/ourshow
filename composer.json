@@ -19,17 +19,17 @@
 	},
 	"scripts": {
 		"post-install-cmd": [
-			"php -n artisan clear-compiled",
-			"php -n artisan optimize"
+			"php artisan clear-compiled",
+			"php artisan optimize"
 		],
 		"pre-update-cmd": [
-			"php -n artisan clear-compiled"
+			"php artisan clear-compiled"
 		],
 		"post-update-cmd": [
-			"php -n artisan optimize"
+			"php artisan optimize"
 		],
 		"post-create-project-cmd": [
-			"php -n artisan key:generate"
+			"php artisan key:generate"
 		]
 	},
 	"config": {
