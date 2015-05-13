@@ -1,0 +1,335 @@
+html {
+  font-family: sans-serif;
+
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  background: transparent;
+}
+
+a:focus {
+  outline: thin dotted;
+}
+
+a:active,
+a:hover {
+  outline: 0;
+}
+
+hr {
+	height:1px;border:none;border-top:1px solid #ccc;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: "Microsoft YaHei", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  line-height: 1;
+  color: inherit;
+}
+
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small,
+.h1 small,
+.h2 small,
+.h3 small,
+.h4 small,
+.h5 small,
+.h6 small,
+h1 .small,
+h2 .small,
+h3 .small,
+h4 .small,
+h5 .small,
+h6 .small,
+.h1 .small,
+.h2 .small,
+.h3 .small,
+.h4 .small,
+.h5 .small,
+.h6 .small {
+  font-weight: normal;
+  line-height: 1;
+  color: #999999;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+h1 small,
+h2 small,
+h3 small,
+h1 .small,
+h2 .small,
+h3 .small {
+  font-size: 65%;
+}
+
+h4,
+h5,
+h6 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+h4 small,
+h5 small,
+h6 small,
+h4 .small,
+h5 .small,
+h6 .small {
+  font-size: 75%;
+}
+
+h1,
+.h1 {
+  font-size: 36px;
+}
+
+h2,
+.h2 {
+  font-size: 30px;
+}
+
+h3,
+.h3 {
+  font-size: 24px;
+}
+
+h4,
+.h4 {
+  font-size: 18px;
+}
+
+h5,
+.h5 {
+  font-size: 14px;
+}
+
+h6,
+.h6 {
+  font-size: 12px;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+.tab-toolbar {
+	border-bottom: 1px solid #D9E8FF;
+	background:url(img/bg_toolbar.png) repeat-x;
+	padding: 3px;
+}
+
+.tab-toolbar table {
+	width:100%;
+	border:0;
+	margin:0;
+	border-collapse:collapse;
+	border-spacing:0;
+}
+
+.tab-toolbar table td.pull-right {
+	text-align:right;
+}
+
+.frame-south {
+	border-bottom: 1px solid #D9E8FF;
+	background:url(img/bg_statusbar.png) repeat-x;
+	padding: 3px;
+}
+
+.frame-south table {
+	width:100%;
+	border:0;
+	margin:0;
+	border-collapse:collapse;
+	border-spacing:0px;
+}
+
+.frame-south table td {
+	color: #0E2D5F;
+}
+
+.frame-south table td.pull-right {
+	text-align:right;
+}
+
+.frame-north {
+	background: url(img/bg_north.png) repeat-x;
+	padding: 3px;
+	margin: 0px; 
+	font-family: arial, sans-serif;
+	font-size: 12px;
+}
+
+.frame-north table {
+	width:100%;
+	border:0;
+	margin:0;
+	border-collapse:collapse;
+	border-spacing:0px;
+}
+
+.frame-north table td {
+	color: #0E2D5F;
+}
+
+.frame-north table td.pull-right {
+	text-align:right;
+}
+
+.datagrid-border-override .datagrid-body td {
+	border-right:1px dotted transparent;
+}
+
+.dashboard-sysload-table {
+	width: 100%;
+	border: 0;
+}
+
+.dashboard-sysload-table td{
+	padding:3px 0;
+}
+
+.dashboard-sysload-table td.underline{
+	border-bottom: 1px dotted #ccc;
+}
+
+.dashboard-sysload-table td.pull_right{
+	text-align:right;
+}
+
+/* Head Table Style*/
+
+.header_table {
+	border-spacing: 0px;
+	width: 100%;
+	border: 0px none;
+	border-spacing: 5px;
+	border-collapse: collapse;
+}
+.header_td_left {
+	padding: 3px 5px 3px 15px;
+	border-collapse:collapse;
+	vertical-align:middle;
+	height:20px;
+	text-align: right;
+}
+.header_td_right {
+	padding: 3px 5px 3px 15px;
+	border-collapse:collapse;
+	vertical-align:middle;
+	height:20px;
+}
+
+/* button size */
+.small_button {
+	width: 60px;
+}
+
+.large_button {
+	width: 80px;
+}
+
+/* webui css */
+#form {
+	width:350px;
+	padding:15px 15px 20px 15px;
+}
+.inputs {
+		margin-top:10px;
+		clear: both;
+}
+.label {
+		float:left;
+		width:150px;
+}
+.input {
+		float:right;
+		width:200px;
+}
+select {
+		width:200px;
+}
+.span {
+		clear: both;
+		height:5px;
+		margin-top:25px;
+
+}
+
+/* button按钮 */
+.button {
+	margin-top: 20px;
+	text-align:left;
+}
+
+.colors {
+	border-color: #95b8e7;
+}
+
+label.checkbox-label input[type=checkbox] {
+    position: relative;
+    vertical-align: middle;
+    bottom: 2px;
+}
+
+label.radio-label input[type=radio] {
+    position: relative;
+    vertical-align: middle;
+    bottom: 4px;
+}
+
+fieldset {
+	margin-top:8px;
+	border:1px solid #ccc;
+}
+
+legend {
+	font-weight:bold;
+	color:#666;
+}
+
+.block-left {
+	padding:6px;
+	text-align:right;
+	float:left;
+}
+
+.block-right {
+	padding:1px;
+}
+
+.block-left-h1 {
+	padding:2px;
+	margin-top:3px;
+	float:left;
+}
+
+.div-tips-border {
+	padding:7px; margin-bottom:15px; font-size: 12px; border:1px dashed #91A7B4
+}
