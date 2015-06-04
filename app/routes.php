@@ -14,6 +14,7 @@
 
 Route::any('/carousel', array('before' => 'guest', 'uses' => 'MainFrameController@carousel'));
 Route::any('/cover', array('before' => 'guest', 'uses' => 'MainFrameController@cover'));
+Route::any('/testp', array('before' => 'guest', 'uses' => 'MainFrameController@testp'));
 
 // 后台登录
 Route::any('/login', array('before' => 'guest', 'uses' => 'LoginController@login'));

@@ -27,4 +27,7 @@ class MainFrameController extends BaseController {
 	public function cover() {
 		return View::make('cover');
 	}
+	public function testp() {
+		return View::make('test');
+	}
 }
