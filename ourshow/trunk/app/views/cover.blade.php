@@ -23,30 +23,15 @@
             <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
             <p class="lead">时间：2015-05-03 11:00</p>
             <p class="lead">地址：北京市长安街北京饭店 <a href="http://todo.com">查看地图</a></p>
-          </div>
-<!-- 
-          <div class="mastfoot">
-            <div class="inner">
-              <p>by <a href="http://ws.ws">ws and tt</a>.</p>
+            <div >
+              <a href="#timeline_continer" >
+                <span class="glyphicon glyphicon-menu-down" ></span>
+              </a>
             </div>
           </div>
- -->
+
         </div>
 
-        <div class="footer_button">
-          <a href="#timeline_continer" >
-            <span class="glyphicon glyphicon-menu-down" ></span>
-          </a>
-        </div>
-        <style type="text/css">
-        .footer_button {
-          position: absolute;
-          bottom: 0px;
-          display: block;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        </style>
       </div>
 
     </div>
@@ -56,196 +41,198 @@
             <h1 id="timeline">时光机</h1>
         </div>
         <ul class="timeline">
-            <li>
-              <div class="timeline-badge danger"><i class="glyphicon glyphicon-heart"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">结婚</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> 11 天后 在 天津</small></p>
+
+            @foreach ($param as $index => $ablum) 
+              <li id="ablum_{{ $ablum['id'] }}" class="{{ ($index%2) ? 'timeline-inverted' : '' }}">
+                
+                <div class="ourshow-likebuttion timeline-badge {{ $ablum['likeit'] ? 'danger' : 'primary' }}" 
+                    data-toggle="tooltip" data-placement="top" 
+                    title="{{ count($ablum['likes']) }} 人表示很赞"
+                    onclick='likeAblum(this, {{ $ablum["id"] }});'
+                >
+                  <i class="glyphicon glyphicon-heart" ></i>
                 </div>
-                <div class="timeline-body caption-body usercomment-sibling">
-                  <img src="./img/timeline/Hydrangeas.jpg" class="img-rounded" style="width:100%;">
-                  <p class="caption">这是一个幸福的时刻</p>
-                </div>
-                <div class="container usercomment">
-                    <div class="text-center">
-                      <div class="input-group">
-                          <input type="text" class="form-control input-sm" placeholder="在这里填写赞美我们的文字..." />
-                          <span class="input-group-btn" onclick="addComment()">     
-                              <a href="#" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
-                          </span>
+
+                <div class="timeline-panel">
+                  <div class="timeline-heading">
+                    <h4 class="timeline-title">{{ $ablum['title'] }}</h4>
+                  </div>
+
+                  <div class="timeline-body">
+                    <img src="{{ $ablum['picture_id']['path'] }}" style="width:100%;"
+                      class="{{ rand(0,1) ? 'img-circle' : 'img-rounded' }}" />
+                    @if ($ablum['caption'])
+                      <p class="caption">{{ $ablum['caption'] }}</p>
+                    @endif
+                  </div>
+
+                  <div class="container usercomment">
+                      <div class="text-center">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" placeholder="赞..." name='comment' />
+                            <span class="input-group-btn" onclick="addComment(this, {{ $ablum['id'] }} );">     
+                                <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
+                            </span>
+                        </div>
+
+                        <hr/>
+                        <ul class="ourshow-commmentlist"
+                          data-options="url:'{{ URL::to('/get-comments').'/'.$ablum['id'] }}'" 
+                        />
+
                       </div>
-                      <hr />
-                      <ul class="list-unstyled text-left">
-                          <strong class="pull-left">James</strong>
-                          <small class="pull-right text-muted">
-                             <span class="glyphicon glyphicon-time"></span>7 分钟 之前</small>
-                          </br>
-                          <li >帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，</li>
-                          </br>
-                          
-                          <strong class="pull-left">Taylor</strong>
-                          <small class="pull-right text-muted">
-                             <span class="glyphicon glyphicon-time"></span>14 分钟 之前</small>
-                          </br>
-                          <li >酷毕了帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，</li>
-                          </br>
-                          
-                          <strong class="pull-left">Taylor</strong>
-                          <small class="pull-right text-muted">
-                             <span class="glyphicon glyphicon-time"></span>14 分钟 之前</small>
-                          </br>
-                          <li >酷毕了帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，帅呆了，</li>
-                          </br>
-                          
-                      </ul>
-                    </div>
-                </div>
-              </div>
-            </li>
-            <li class="timeline-inverted">
-              <div class="timeline-badge danger"><i class="glyphicon glyphicon-heart"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">有欢笑</h4>
-                </div>
-                <div class="timeline-body">
-                  <img src="./img/timeline/Koala.jpg" class="img-circle" style="width:100%;">
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="timeline-badge danger"><i class="glyphicon glyphicon-heart"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">也有哭泣</h4>
-                </div>
-                <div class="timeline-body">
-                  <img src="./img/timeline/Penguins.jpg" class="img-circle" style="width:100%;">
-                </div>
-              </div>
-            </li>
-            <li class="timeline-inverted">
-              <div class="timeline-badge success"><i class="glyphicon glyphicon-thumbs-up"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">但，幸福一直在</h4>
-                </div>
-                <div class="timeline-body">
-                  <img src="./img/timeline/Lighthouse.jpg" class="img-rounded" style="width:100%;">
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">有相聚</h4>
-                </div>
-                <div class="timeline-body">
-                  <img src="./img/timeline/Hydrangeas.jpg" class="img-circle" style="width:100%;">
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="timeline-badge info"><i class="glyphicon glyphicon-floppy-disk"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">也有分离</h4>
-                </div>
-                <div class="timeline-body">
-                  <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
-                  <hr>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
-                      <i class="glyphicon glyphicon-cog"></i> <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                      <li><a href="#">Action</a></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
-                      <li class="divider"></li>
-                      <li><a href="#">Separated link</a></li>
-                    </ul>
                   </div>
                 </div>
-              </div>
-            </li>
-            <li>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Mussum ipsum cacilds</h4>
-                </div>
-                <div class="timeline-body">
-                  <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
-                </div>
-              </div>
-            </li>
-            <li class="timeline-inverted">
-              <div class="timeline-badge success"><i class="glyphicon glyphicon-thumbs-up"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Mussum ipsum cacilds</h4>
-                </div>
-                <div class="timeline-body">
-                  <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
-                </div>
-              </div>
-            </li>
+              </li>
+            @endforeach
+
         </ul>
     </div>
 
     <style type="text/css">
 
-    .site-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      background-image: url(../img/hand.jpg);
-      background-repeat:no-repeat;
-      width: 100%;
-      height: 100%; /* For at least Firefox */
-      min-height: 100%;
-      -webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
-              box-shadow: inset 0 0 100px rgba(0,0,0,.7);
-      ;
-      background-color: #333; /* 黑灰色的背景 */
-      -webkit-filter: blur(1px); /* 模糊特效 */
-    }
+      .site-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        background-image: url(../img/hand.jpg);
+        background-repeat:no-repeat;
+        width: 100%;
+        height: 100%; /* For at least Firefox */
+        min-height: 100%;
+        -webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
+                box-shadow: inset 0 0 100px rgba(0,0,0,.7);
+        ;
+        background-color: #333; /* 黑灰色的背景 */
+        -webkit-filter: blur(1px); /* 模糊特效 */
+      }
 
-    div.usercomment-sibling {
-      position: relative;
-    }
+      div.usercomment-sibling {
+        position: relative;
+      }
 
-    div.usercomment {
-      position: relative;
-      top: 20px;
-      left: 0px;
-      width: 100%;
-    }
+      div.usercomment {
+        position: relative;
+        top: 20px;
+        left: 0px;
+        width: 100%;
+      }
 
-    div.caption-body {
-      position: relative;
-    }
-    div.caption-body p.caption {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      margin: 0;
-      color: #fff;
-      font-size: 13px;
-      line-height: 16px;
-      font-style: italic;
-      padding: 5px;
-      background: rgba(0,0,0,0.5);
-      width: 100%;
-    }
+      div.caption-body {
+        position: relative;
+      }
+      div.caption-body p.caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        margin: 0;
+        color: #fff;
+        font-size: 13px;
+        line-height: 16px;
+        font-style: italic;
+        padding: 5px;
+        background: rgba(0,0,0,0.5);
+        width: 100%;
+      }
 
     </style>
 @stop
 
 
 @section('js')
+
+<script type="text/javascript">
+
+$(function(){
+  // 相册评论列表
+  $('ul.ourshow-commmentlist').each(function(index, elem){
+    reloadComment($(elem));
+  });
+
+  // 工具栏提示
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+function likeAblum (button, ablum_id) {
+  button = $(button);
+  var likeit = button.hasClass('danger');
+  $.post(
+    '{{ URL::to("/switch-like") }}' + '/' + ablum_id + '/' + (likeit ? '0' : '1'),   // URL
+    JSON.stringify({}), // data
+    function(data) {
+      if (1 != data.status) {
+        // 失败
+        $().alert('close'); // test TODO
+        return;
+      }
+      if (likeit != data.data.likeit) {
+        if (likeit) {
+          button.removeClass('danger');
+          button.addClass('primary');
+        }
+        else {
+          button.removeClass('primary');
+          button.addClass('danger');
+        }
+        button.attr('data-original-title', Object.keys(data.data.likes).length + ' 人表示很赞');
+      }
+    },     // callback
+    "json" // data type
+  );
+  return true;
+}
+
+function addComment (button, ablum_id) {
+  var comment = $(button).prev('input').val();
+  $.post(
+    '{{ URL::to("/add-comments") }}' + '/' + ablum_id,   // URL
+    JSON.stringify({ comment : comment }), // data
+    function(data) {
+      if (1 != data.status) {
+        // 失败
+        $().alert('close'); // test TODO
+        return;
+      }
+      var commmentlist = $(button).closest('div.text-center').children('ul.ourshow-commmentlist');
+      reloadComment($(commmentlist));
+    },     // callback
+    "json" // data type
+  );
+  return true;
+}
+
+function reloadComment(commmentlist) {
+  commmentlist.html('');
+  var data_options = eval('({' + commmentlist.attr('data-options') + '})');
+  $.get(
+    data_options.url,   // URL
+    function(data) {
+      if (1 != data.status) {
+        // fail
+        return;
+      }
+      // success
+      // elem.append('<hr/>');
+      for (var index in data.data) {
+        var comment = data.data[index];
+        commmentlist.addClass('list-unstyled').addClass('text-left');
+        commmentlist.append($('<strong>').addClass('pull-left').html(comment['user_id']['username']));
+        commmentlist.append(
+          $('<small/>').addClass('pull-right').addClass('text-muted')
+            .append($('<span/>').addClass('glyphicon').addClass('glyphicon-time'))
+            .append(comment['updated_at']+' 前')
+        );
+        commmentlist.append('<br/>');
+        commmentlist.append($('<li/>').html(comment['text']));
+        commmentlist.append('<br/>');
+        // console.debug(commmentlist.html());
+      }
+    }// callback
+  );
+}
+</script>
+
 <script type="text/javascript">
 </script>
 @stop
