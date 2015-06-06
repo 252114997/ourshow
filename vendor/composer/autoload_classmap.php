@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'AccountSeeder' => $baseDir . '/app/database/seeds/AccountSeeder.php',
     'ActiveDirectoryConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
     'AntifakeipConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
     'BandwidthConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
@@ -33,8 +32,13 @@ return array(
     'ClassPreloader\\Parser\\DirVisitor' => $vendorDir . '/classpreloader/classpreloader/src/ClassPreloader/Parser/DirVisitor.php',
     'ClassPreloader\\Parser\\FileVisitor' => $vendorDir . '/classpreloader/classpreloader/src/ClassPreloader/Parser/FileVisitor.php',
     'ClassPreloader\\Parser\\NodeTraverser' => $vendorDir . '/classpreloader/classpreloader/src/ClassPreloader/Parser/NodeTraverser.php',
-    'CreateAccounts' => $baseDir . '/app/database/migrations/2014_06_10_110402_create_accounts.php',
     'CreateGlobalSettings' => $baseDir . '/app/database/migrations/2014_06_10_103230_create_global_settings.php',
+    'CreateTbAblumPictureTable' => $baseDir . '/app/database/migrations/2015_06_04_191537_create_tb_ablum_picture_table.php',
+    'CreateTbAblumsTable' => $baseDir . '/app/database/migrations/2015_06_04_200357_create_tb_ablums_table.php',
+    'CreateTbLikeTable' => $baseDir . '/app/database/migrations/2015_06_04_191619_create_tb_like_table.php',
+    'CreateTbPicturesTable' => $baseDir . '/app/database/migrations/2015_06_04_191625_create_tb_pictures_table.php',
+    'CreateTbPostsTable' => $baseDir . '/app/database/migrations/2015_06_04_191635_create_tb_posts_table.php',
+    'CreateTbUsersTable' => $baseDir . '/app/database/migrations/2015_06_04_192438_create_tb_users_table.php',
     'Crypt_AES' => $vendorDir . '/phpseclib/phpseclib/phpseclib/Crypt/AES.php',
     'Crypt_Base' => $vendorDir . '/phpseclib/phpseclib/phpseclib/Crypt/Base.php',
     'Crypt_Blowfish' => $vendorDir . '/phpseclib/phpseclib/phpseclib/Crypt/Blowfish.php',
@@ -1953,7 +1957,6 @@ return array(
     'System_SSH_Agent' => $vendorDir . '/phpseclib/phpseclib/phpseclib/System/SSH/Agent.php',
     'System_SSH_Agent_Identity' => $vendorDir . '/phpseclib/phpseclib/phpseclib/System/SSH/Agent.php',
     'SysversionConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
-    'TBAccount' => $baseDir . '/app/models/TBAccount.php',
     'TestCase' => $baseDir . '/app/tests/TestCase.php',
     'UrlConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
     'Util' => $baseDir . '/app/controllers/utility/UtilController.php',
@@ -2020,4 +2023,10 @@ return array(
     'Xethron\\MigrationsGenerator\\Syntax\\RemoveForeignKeysFromTable' => $vendorDir . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/RemoveForeignKeysFromTable.php',
     'Xethron\\MigrationsGenerator\\Syntax\\Table' => $vendorDir . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/Table.php',
     'ipLocation' => $baseDir . '/app/controllers/utility/ipLocation.php',
+    'tb_ablum_picture' => $baseDir . '/app/models/tb_ablum_picture.php',
+    'tb_ablums' => $baseDir . '/app/models/tb_ablums.php',
+    'tb_like' => $baseDir . '/app/models/tb_like.php',
+    'tb_pictures' => $baseDir . '/app/models/tb_pictures.php',
+    'tb_posts' => $baseDir . '/app/models/tb_posts.php',
+    'tb_users' => $baseDir . '/app/models/tb_users.php',
 );

@@ -16,6 +16,12 @@ Route::any('/carousel', array('before' => 'guest', 'uses' => 'MainFrameControlle
 Route::any('/cover', array('before' => 'guest', 'uses' => 'MainFrameController@cover'));
 Route::any('/testp', array('before' => 'guest', 'uses' => 'MainFrameController@testp'));
 
+
+Route::get('/get-comments/{ablum_id}', 'MainFrameController@getComments');
+Route::post('/add-comments/{ablum_id}', 'MainFrameController@addComments');
+
+Route::post('/switch-like/{ablum_id}/{likeit}', 'MainFrameController@switchLike');
+
 // 后台登录
 Route::any('/login', array('before' => 'guest', 'uses' => 'LoginController@login'));
 
