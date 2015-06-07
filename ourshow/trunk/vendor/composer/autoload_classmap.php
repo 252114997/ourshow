@@ -1959,6 +1959,7 @@ return array(
     'SysversionConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
     'TestCase' => $baseDir . '/app/tests/TestCase.php',
     'UrlConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
+    'UserAuthController' => $baseDir . '/app/controllers/UserAuthController.php',
     'Util' => $baseDir . '/app/controllers/utility/UtilController.php',
     'UtilController' => $baseDir . '/app/controllers/utility/UtilController.php',
     'VlanConfig' => $baseDir . '/app/controllers/utility/BaseConfigFile.php',
@@ -2028,5 +2029,6 @@ return array(
     'tb_like' => $baseDir . '/app/models/tb_like.php',
     'tb_pictures' => $baseDir . '/app/models/tb_pictures.php',
     'tb_posts' => $baseDir . '/app/models/tb_posts.php',
+    'tb_user_token' => $baseDir . '/app/models/tb_user_token.php',
     'tb_users' => $baseDir . '/app/models/tb_users.php',
 );
