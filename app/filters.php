@@ -35,7 +35,7 @@ App::after(function($request, $response)
 
 Route::filter('auth', function()
 {
-	if (Auth::guest())
+	if (UserAuthController::guest())
 	{
 		if (Request::ajax())
 		{
@@ -48,10 +48,10 @@ Route::filter('auth', function()
 	}
 });
 
-Route::filter('auth.basic', function()
-{
-	return Auth::basic();
-});
+// Route::filter('auth.basic', function()
+// {
+// 	return Auth::basic();
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -66,7 +66,7 @@ Route::filter('auth.basic', function()
 
 Route::filter('guest', function()
 {
-	if (Auth::check()) return Redirect::to('/');
+	if (UserAuthController::isLogin()) return Redirect::to('/');
 });
 
 /*

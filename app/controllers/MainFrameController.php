@@ -2,32 +2,77 @@
 
 class MainFrameController extends BaseController {
 
-	public function index()
-	{		
-		$company = DB::table('tb_global_settings')
-						->where('name', 'company')
-						->first();
+	public function login()	{
+		if (Request::isMethod('get')) {
+			return View::make('login');
+		}
+		if (!Request::isMethod('post')) {
+			return Response::make('此页面只能用GET/POST方法访问!', 404);
+		}
+		$user_id = Input::get('user_id');
+		$token = Input::get('token');
 
-		$product = DB::table('tb_product')
-						->join('tb_global_settings', function($join) {
-							$join->on('tb_product.name', '=', 'tb_global_settings.value')
-								 ->where('tb_global_settings.name', '=', 'product');
-						})
-						->select('tb_product.description')
-						->first();
+		$user_info = tb_users::where('id', $user_id)->first();
+		if (null == $user_info) {
+			return Redirect::to('/login')
+				->with('error_info', '需要邀请码才能访问啊喂')
+				->withInput();
+		}
 
-		return View::make('index')
-				->with('product', $product ? $product->description : '')
-				->with('company', $company ? $company->value : '');
+		$user_token_info = tb_user_token::select()
+			->where('user_id', $user_id)
+			->where('token', $token)
+			->first();
+		if (null == $user_token_info) {
+			return Redirect::to('/login')
+				->with('error_info', '邀请码不对啊喂，仔细核对一下短信')
+				->withInput();
+		}
+		tb_user_token::where('user_id', $user_id)
+			->where('token', $token)
+			->update(array('used' => 1));
+			
+		Session::put('user_token.user_id', $user_id);
+		Session::put('user_token.token', $token);
+
+		return Redirect::to('/welcome');
 	}
+
+	public function welcome() {
+		$user_id = UserAuthController::getLoginUserid();
+		// $user_id = 1; // TODO test
+		$page = intval(Input::get('page', '1'));
+		$rows = intval(Input::get('rows', '10'));
+
+		$total = tb_ablums::select()->count();
+		$offset = ($page - 1) * $rows;
+
+		$items = tb_ablums::select()
+			->orderBy('created_at', 'asc')
+			->skip($offset)
+			->take($rows)
+			->get()
+			->toArray();
+
+		foreach ($items as $key => &$value) {
+			$value['picture_id'] = tb_pictures::find($value['picture_id'])->toArray();
+			$value['likes'] = self::getLikesOfAblum($value['id']);
+			$value['likeit'] = self::isLikeIt($value['id'], $user_id);
+			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
+		}
+
+		return View::make('welcome')
+			->with('param', $items);
+	}
+
 
 	public function carousel() {
 		return View::make('carousel');
 	}
 
 	public function cover() {
-		$user_id = Cookie::get('user_id');
-		$user_id = 1; // TODO test
+		$user_id = UserAuthController::getLoginUserid();
+		// $user_id = 1; // TODO test
 		$page = intval(Input::get('page', '1'));
 		$rows = intval(Input::get('rows', '10'));
 
@@ -53,8 +98,8 @@ class MainFrameController extends BaseController {
 	}
 
 	public function addComments($ablum_id) {
-		$user_id = Cookie::get('user_id');
-		$user_id = 1; // TODO test
+		$user_id = self::UserAuthController();
+		// $user_id = 1; // TODO test
 
 		$input = Input::json();
 		$comment = $input->get('comment');
@@ -83,8 +128,8 @@ class MainFrameController extends BaseController {
 	}
 
 	public function switchLike($ablum_id, $likeit) {
-		$user_id = Cookie::get('user_id');
-		$user_id = 1; // TODO test
+		$user_id = self::UserAuthController();
+		// $user_id = 1; // TODO test
 
 		if (1 == $likeit) {// like it
 			tb_like::firstOrCreate(array('user_id' => $user_id, 'ablum_id' => $ablum_id ));
