@@ -3,6 +3,10 @@
 class MainFrameController extends BaseController {
 
 	public function login()	{
+		if (UserAuthController::isLogin()) {
+			return Redirect::to('/welcome');
+		}
+
 		if (Request::isMethod('get')) {
 			return View::make('login');
 		}
@@ -98,8 +102,7 @@ class MainFrameController extends BaseController {
 	}
 
 	public function addComments($ablum_id) {
-		$user_id = self::UserAuthController();
-		// $user_id = 1; // TODO test
+		$user_id = UserAuthController::getLoginUserid();
 
 		$input = Input::json();
 		$comment = $input->get('comment');
@@ -128,8 +131,7 @@ class MainFrameController extends BaseController {
 	}
 
 	public function switchLike($ablum_id, $likeit) {
-		$user_id = self::UserAuthController();
-		// $user_id = 1; // TODO test
+		$user_id = UserAuthController::getLoginUserid();
 
 		if (1 == $likeit) {// like it
 			tb_like::firstOrCreate(array('user_id' => $user_id, 'ablum_id' => $ablum_id ));
