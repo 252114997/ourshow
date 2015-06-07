@@ -91,23 +91,6 @@
 
     <style type="text/css">
 
-      .site-background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: -1;
-        background-image: url(../img/hand.jpg);
-        background-repeat:no-repeat;
-        width: 100%;
-        height: 100%; /* For at least Firefox */
-        min-height: 100%;
-        -webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
-                box-shadow: inset 0 0 100px rgba(0,0,0,.7);
-        ;
-        background-color: #333; /* 黑灰色的背景 */
-        -webkit-filter: blur(1px); /* 模糊特效 */
-      }
-
       div.usercomment-sibling {
         position: relative;
       }
@@ -176,6 +159,7 @@ function likeAblum (button, ablum_id) {
           button.addClass('danger');
         }
         button.attr('data-original-title', Object.keys(data.data.likes).length + ' 人表示很赞');
+        button.tooltip('show');
       }
     },     // callback
     "json" // data type

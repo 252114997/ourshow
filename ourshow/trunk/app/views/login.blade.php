@@ -10,7 +10,9 @@
 
 @section('body')
 
-    <div class="site-wrapper site-background" >
+    <div class="site-background">
+    </div>
+    <div class="site-wrapper" >
 
       <div class="site-wrapper-inner">
 
@@ -65,19 +67,6 @@
 
     <style type="text/css">
 
-      .site-background {
-        z-index: -1;
-        background-image: url(../img/hand.jpg);
-        background-repeat:no-repeat;
-        width: 100%;
-        height: 100%; /* For at least Firefox */
-        min-height: 100%;
-        -webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
-                box-shadow: inset 0 0 100px rgba(0,0,0,.7);
-        ;
-        background-color: #333; /* 黑灰色的背景 */
-        -webkit-filter: blur(0px); /* 模糊特效 */
-      }
     </style>
 
 @stop
