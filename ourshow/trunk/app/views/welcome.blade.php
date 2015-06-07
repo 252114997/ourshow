@@ -4,6 +4,8 @@
 
   <link rel="stylesheet" type="text/css" href="{{ asset('css/cover.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/timeline.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/comment.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/bounce.css') }}">
 
 @stop
 
@@ -23,11 +25,10 @@
             <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
             <p class="lead">时间：2015-05-03 11:00</p>
             <p class="lead">地址：北京市长安街北京饭店 <a href="http://todo.com">查看地图</a></p>
-            <div >
-              <a href="#timeline_continer" >
-                <span class="glyphicon glyphicon-menu-down" ></span>
-              </a>
-            </div>
+
+            <a href="#timeline_continer" class="icon-button bounce" title="下拉显示更多">
+              <span class="glyphicon glyphicon-triangle-bottom" ></span>
+            </a>
           </div>
 
         </div>
@@ -89,37 +90,6 @@
         </ul>
     </div>
 
-    <style type="text/css">
-
-      div.usercomment-sibling {
-        position: relative;
-      }
-
-      div.usercomment {
-        position: relative;
-        top: 20px;
-        left: 0px;
-        width: 100%;
-      }
-
-      div.caption-body {
-        position: relative;
-      }
-      div.caption-body p.caption {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        margin: 0;
-        color: #fff;
-        font-size: 13px;
-        line-height: 16px;
-        font-style: italic;
-        padding: 5px;
-        background: rgba(0,0,0,0.5);
-        width: 100%;
-      }
-
-    </style>
 @stop
 
 

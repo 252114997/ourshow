@@ -1,0 +1,28 @@
+
+div.usercomment-sibling {
+  position: relative;
+}
+
+div.usercomment {
+  position: relative;
+  top: 20px;
+  left: 0px;
+  width: 100%;
+}
+
+div.caption-body {
+  position: relative;
+}
+div.caption-body p.caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  color: #fff;
+  font-size: 13px;
+  line-height: 16px;
+  font-style: italic;
+  padding: 5px;
+  background: rgba(0,0,0,0.5);
+  width: 100%;
+}

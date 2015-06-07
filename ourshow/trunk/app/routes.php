@@ -12,9 +12,9 @@
 */
 
 
-Route::any('/carousel', array('before' => 'guest', 'uses' => 'MainFrameController@carousel'));
-Route::any('/cover', array('before' => 'guest', 'uses' => 'MainFrameController@cover'));
-Route::any('/testp', array('before' => 'guest', 'uses' => 'MainFrameController@testp'));
+Route::any('/carousel', 'MainFrameController@carousel');
+Route::any('/cover', 'MainFrameController@cover');
+Route::any('/testp', 'MainFrameController@testp');
 
 
 Route::any('/login', 'MainFrameController@login');
