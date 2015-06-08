@@ -8,18 +8,27 @@ class MainFrameController extends BaseController {
 		}
 
 		if (Request::isMethod('get')) {
-			return View::make('login');
+			$user_id = Input::get('user_id', null);
+			if (null != $user_id) {
+				$response = Response::make(View::make('login'));
+				$response->withCookie(Cookie::make('user_id', $user_id));
+				return $response;
+			}
+			return View::make('login')
+				->with('error_info', '需要邀请码才能访问啊喂！请点击 短信/微信/QQ 中的链接地址访问');
 		}
+
 		if (!Request::isMethod('post')) {
 			return Response::make('此页面只能用GET/POST方法访问!', 404);
 		}
-		$user_id = Input::get('user_id');
+
 		$token = Input::get('token');
+		$user_id = Cookie::get('user_id');
 
 		$user_info = tb_users::where('id', $user_id)->first();
 		if (null == $user_info) {
 			return Redirect::to('/login')
-				->with('error_info', '需要邀请码才能访问啊喂')
+				->with('error_info', '未找到用户！请点击 短信/微信/QQ 中的链接地址访问')
 				->withInput();
 		}
 
