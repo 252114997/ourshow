@@ -37,6 +37,11 @@
                       {{ Session::get('error_info') }}
                     </p>
                   @endif
+                  @if (isset($error_info))
+                    <p class="lead text-danger">
+                      {{ $error_info }}
+                    </p>
+                  @endif
                 </div>
               </div>
 
@@ -49,8 +54,7 @@
               </div>
 
               <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-2">
-                  <input type="hidden" name="user_id" value="{{ Input::get('id', '') }}" />  
+                <div class="col-sm-offset-2 col-sm-2"> 
                   <button type="submit" class="btn btn-primary">登录</button>
                 </div>
               </div>
