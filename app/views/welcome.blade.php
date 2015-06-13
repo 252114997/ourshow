@@ -46,11 +46,10 @@
             @foreach ($param as $index => $ablum) 
               <li id="ablum_{{ $ablum['id'] }}" class="{{ ($index%2) ? 'timeline-inverted' : '' }}">
                 
-                <div class="ourshow-likebuttion timeline-badge {{ $ablum['likeit'] ? 'danger' : 'primary' }}" 
+                <div class=" timeline-badge {{ $ablum['likeit'] ? 'heart-like' : 'heart-unlike' }}" 
                     data-toggle="tooltip" data-placement="top" 
                     title="{{ count($ablum['likes']) }} 人表示很赞"
-                    onclick='likeAblum(this, {{ $ablum["id"] }});'
-                >
+                    onclick='likeAblum(this, {{ $ablum["id"] }});' >
                   <i class="glyphicon glyphicon-heart" ></i>
                 </div>
 
@@ -107,27 +106,34 @@ $(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
 
+function doLikeit(button, likeit) {
+  if (likeit) {
+    button.removeClass('heart-unlike').addClass('heart-like');
+  }
+  else {
+    button.removeClass('heart-like').addClass('heart-unlike');
+  }
+}
 function likeAblum (button, ablum_id) {
   button = $(button);
-  var likeit = button.hasClass('danger');
+  var likeit = button.hasClass('heart-like');
+  doLikeit(button, !likeit);
   $.post(
     '{{ URL::to("/switch-like") }}' + '/' + ablum_id + '/' + (likeit ? '0' : '1'),   // URL
     JSON.stringify({}), // data
     function(data) {
+      var cur_likeit = likeit;
       if (1 != data.status) {
         // 失败
-        $().alert('close'); // test TODO
-        return;
+        cur_likeit = !likeit;
       }
-      if (likeit != data.data.likeit) {
-        if (likeit) {
-          button.removeClass('danger');
-          button.addClass('primary');
-        }
-        else {
-          button.removeClass('primary');
-          button.addClass('danger');
-        }
+      else {
+        cur_likeit = data.data.likeit;
+      }
+      if (cur_likeit != data.data.likeit) {
+        doLikeit(button, cur_likeit);
+      }
+      if (data.status) {
         button.attr('data-original-title', Object.keys(data.data.likes).length + ' 人表示很赞');
         button.tooltip('show');
       }

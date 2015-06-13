@@ -87,7 +87,7 @@
             top: 16px;
             left: 50%;
             margin-left: -25px;
-            background-color: #999999;
+            /*background-color: #999999; 去除圆形背景*/
             z-index: 100;
             border-top-right-radius: 50%;
             border-top-left-radius: 50%;
@@ -132,6 +132,7 @@
 .timeline-badge.info {
     background-color: #5bc0de !important;
 }
+
 
 .timeline-title {
     margin-top: 0;
@@ -181,4 +182,37 @@
             left: -14px;
             right: auto;
         }
+}
+
+
+.heart-like > i{
+  font-size: 2.5em;
+  vertical-align: middle;
+  color: rgba(172,41,37, 1);
+  text-shadow: 1px 1px 3px rgba(172,41,37,1);
+}
+.heart-like:hover > i {
+  cursor: pointer;
+  color: rgba(210,50,45, 1);
+  text-shadow: 1px 1px 9px rgba(210,50,45,1);
+}
+.heart-like > i:active {
+  color: rgba(217,83,79, 1);
+  text-shadow: 1px 1px 9px rgba(217,83,79,1);
+}
+
+.heart-unlike > i {
+  font-size: 2.5em;
+  vertical-align: middle;
+  color: rgba(200,200,200, 1);
+  text-shadow: 1px 1px 3px rgba(200,200,200, 1);
+}
+.heart-unlike:hover > i {
+  cursor: pointer;
+  color: rgba(230,160,160, 1);
+  text-shadow: 1px 1px 9px rgba(230,160,160, 1);
+}
+.heart-unlike > i:active {
+  color: rgba(217,83,79, 1);
+  text-shadow: 1px 1px 9px rgba(217,83,79,1);
 }
