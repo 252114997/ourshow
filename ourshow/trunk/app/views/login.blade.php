@@ -10,7 +10,7 @@
 
 @section('body')
 
-    <div class="site-background">
+    <div class="site-background filter-blur">
     </div>
     <div class="site-wrapper" >
 
@@ -70,7 +70,9 @@
     </div>
 
     <style type="text/css">
-
+      .filter-blur {
+        -webkit-filter: blur(10px); /* 模糊特效 */
+      }
     </style>
 
 @stop
