@@ -55,7 +55,7 @@ class MainFrameController extends BaseController {
 		$user_id = UserAuthController::getLoginUserid();
 		// $user_id = 1; // TODO test
 		$page = intval(Input::get('page', '1'));
-		$rows = intval(Input::get('rows', '10'));
+		$rows = intval(Input::get('rows', '6'));
 
 		$total = tb_ablums::select()->count();
 		$offset = ($page - 1) * $rows;
@@ -87,7 +87,7 @@ class MainFrameController extends BaseController {
 		$user_id = UserAuthController::getLoginUserid();
 		// $user_id = 1; // TODO test
 		$page = intval(Input::get('page', '1'));
-		$rows = intval(Input::get('rows', '10'));
+		$rows = intval(Input::get('rows', '6'));
 
 		$total = tb_ablums::select()->count();
 		$offset = ($page - 1) * $rows;
@@ -132,7 +132,7 @@ class MainFrameController extends BaseController {
 	public function getComments($ablum_id) {
 
 		$page = intval(Input::get('page', '1'));
-		$rows = intval(Input::get('rows', '10'));
+		$rows = intval(Input::get('rows', '6'));
 
 		$items = self::getCommentsOfAblum($ablum_id, $page, $rows);
 
@@ -192,7 +192,8 @@ class MainFrameController extends BaseController {
 			$value['updated_at'] = FormatFunc::time($now->getTimestamp() - $updated_at->getTimestamp());
 		}
 
-		return $items;
+		return array('rows' => $items, 'count' => $total);
+		// return $items;
 	}
 
 }
