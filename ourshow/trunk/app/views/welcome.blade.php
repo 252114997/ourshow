@@ -11,16 +11,13 @@
 
 
 @section('body')
+
     <div class="site-background">
     </div>
 
-    <div class="site-wrapper" >
+    <div class="cover-continer-my" >
 
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container" >
-
-          <div class="inner cover" >
+          <div class="cover-inner-my" >
             <h1 class="cover-heading">见证我们爱情</h1>
             <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
             <p class="lead">时间：2015-05-03 11:00</p>
@@ -30,11 +27,6 @@
               <span class="glyphicon glyphicon-triangle-bottom" ></span>
             </a>
           </div>
-
-
-        </div>
-
-      </div>
 
     </div>
 
@@ -94,8 +86,6 @@
     <div class="mastfoot mastfoot-ext">
         <p>由<a > WS & TT </a>提供强劲技术支持</p>
     </div>
-    <style type="text/css">
-    </style>
 
 @stop
 
