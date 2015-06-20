@@ -12,8 +12,7 @@
 
 @section('body')
 
-    <div class="site-background">
-    </div>
+    <div class="site-background"></div>
 
     <div class="cover-continer-my" >
 
@@ -23,11 +22,14 @@
             <p class="lead">时间：2015-05-03 11:00</p>
             <p class="lead">地址：北京市长安街北京饭店 <a href="http://todo.com">查看地图</a></p>
 
-            <a href="#timeline_continer" class="icon-button bounce" title="下拉显示更多">
+          </div>
+
+          <div class="footer-info">
+            <a href="#timeline_continer" class="icon-button bounce" title="下拉显示更多"
+              onclick="$(this).hide();" >
               <span class="glyphicon glyphicon-triangle-bottom" ></span>
             </a>
           </div>
-
     </div>
 
     <div id="timeline_continer" class="container">

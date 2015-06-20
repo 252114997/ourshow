@@ -177,7 +177,7 @@ body {
 
 
 /** 
- * @breif 实现居中效果
+ * @brief 实现居中效果
  */
 
 .cover-continer-my {
@@ -198,8 +198,8 @@ body {
 /*如果目标是纵向模式智能手机，则使用：*/
 @media (max-width: 320px) { 
     .cover-inner-my {
-      min-height: 100%;
-      min-width: 100%;
+      min-height: 80%;
+      min-width: 90%;
       max-height: 100%;
       max-width: 100%;
     }
@@ -210,8 +210,8 @@ body {
     .cover-inner-my {
       min-height: 60%;
       min-width: 90%;
-      max-height: 70%;
-      max-width: 90%;
+      max-height: 100%;
+      max-width: 100%;
     }
 }
 
@@ -239,7 +239,7 @@ body {
 
 
 /** 
- * @breif 展示背景图
+ * @brief 展示背景图
  */
 .site-background {
   z-index: -1;
@@ -267,7 +267,7 @@ body {
 
 
 /** 
- * @breif 使结尾的作者信息水平居中显示
+ * @brief 使结尾的作者信息水平居中显示
  */
 .mastfoot-ext {
   left: 50%;
@@ -276,3 +276,15 @@ body {
   height: auto;
 }
 
+
+/**
+ * @brief 位于首面底部的 弹跳的引导按钮
+ */
+.footer-info {
+  left: 50%;
+  width: auto;
+  height: auto;
+
+  position: fixed;
+  bottom: 0; 
+}
