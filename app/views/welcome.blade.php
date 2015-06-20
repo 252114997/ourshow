@@ -31,6 +31,7 @@
             </a>
           </div>
 
+
         </div>
 
       </div>
@@ -69,16 +70,17 @@
                   <div class="container usercomment">
                       <div class="text-center">
                         <div class="input-group">
-                            <input type="text" class="form-control input-sm" placeholder="赞..." name='comment' />
+                            <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
+                              onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
                             <span class="input-group-btn" onclick="addComment(this, {{ $ablum['id'] }} );">     
-                                <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
+                              <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
                             </span>
                         </div>
 
                         <hr/>
                         <ul class="ourshow-commmentlist"
                           data-options="url:'{{ URL::to('/get-comments').'/'.$ablum['id'] }}'" 
-                        />
+                        ></ul>
 
                       </div>
                   </div>
@@ -88,6 +90,12 @@
 
         </ul>
     </div>
+
+    <div class="mastfoot mastfoot-ext">
+        <p>由<a > WS & TT </a>提供强劲技术支持</p>
+    </div>
+    <style type="text/css">
+    </style>
 
 @stop
 
@@ -145,6 +153,8 @@ function likeAblum (button, ablum_id) {
 
 function addComment (button, ablum_id) {
   var comment = $(button).prev('input').val();
+  $(button).prev('input').focus();
+
   $.post(
     '{{ URL::to("/add-comments") }}' + '/' + ablum_id,   // URL
     JSON.stringify({ comment : comment }), // data
@@ -154,6 +164,7 @@ function addComment (button, ablum_id) {
         $().alert('close'); // test TODO
         return;
       }
+      $(button).prev('input').val('');
       var commmentlist = $(button).closest('div.text-center').children('ul.ourshow-commmentlist');
       reloadComment($(commmentlist));
     },     // callback
@@ -162,20 +173,44 @@ function addComment (button, ablum_id) {
   return true;
 }
 
-function reloadComment(commmentlist) {
-  commmentlist.html('');
+function pageComment(page_button) {
+  page_button = $(page_button);
+  var commmentlist = page_button.closest('div.text-center').children('ul.ourshow-commmentlist');
   var data_options = eval('({' + commmentlist.attr('data-options') + '})');
+  var cur_data_options = eval('({' + page_button.attr('data-options') + '})');
+  data_options.pageNumber = cur_data_options.pageNumber;
+  data_options.pageSize   = cur_data_options.pageSize;
+
+  var data_options_string = JSON.stringify(data_options);
+  data_options_string = $.ltrim(data_options_string, '{');
+  data_options_string = $.rtrim(data_options_string, '}');
+
+  // console.debug('param data_options=' +  $.param(data_options));
+  console.debug('json  data_options=' +  data_options_string);
+  commmentlist.attr('data-options', data_options_string);
+  reloadComment(commmentlist);
+}
+
+function reloadComment(commmentlist) {
+  // commmentlist.html('');
+  var data_options = eval('({' + commmentlist.attr('data-options') + '})');
+  var request_url = data_options.url;
+  if (data_options.pageNumber && data_options.pageSize) {
+    request_url += '?' + $.param({ page:data_options.pageNumber, rows:data_options.pageSize});
+  }
   $.get(
-    data_options.url,   // URL
+    request_url,   // URL
     function(data) {
       if (1 != data.status) {
         // fail
         return;
       }
       // success
-      // elem.append('<hr/>');
-      for (var index in data.data) {
-        var comment = data.data[index];
+
+      // 加载评论
+      commmentlist.html('');
+      for (var index in data.data.rows) {
+        var comment = data.data.rows[index];
         commmentlist.addClass('list-unstyled').addClass('text-left');
         commmentlist.append($('<strong>').addClass('pull-left').html(comment['user_id']['username']));
         commmentlist.append(
@@ -188,11 +223,67 @@ function reloadComment(commmentlist) {
         commmentlist.append('<br/>');
         // console.debug(commmentlist.html());
       }
+
+      // 加载分页按钮
+      var page_number = data_options.pageNumber || 1;
+      var page_size = data_options.pageSize || 6;
+      var page_sum = Math.floor((page_size+data.data.count-1)  / page_size); // 计算页面总数。
+
+      console.debug('page_number=' + page_number);
+      console.debug('page_size=' + page_size);
+      console.debug('page_sum=' + page_sum);
+      console.debug('data.count=' + data.data.count);
+      console.debug(' ');
+
+      var pagination = $('');
+      var class_name = '';
+      if (page_sum > 1) {
+        pagination = $('<ul/>').addClass('pagination');
+
+        class_name = ((page_number == 1) ? 'disabled' : '');
+        // pagination.append($('<li/>').addClass(class_name).html('<a onclick="pageComment(this);" data-options="pageSize:' + page_size + ' ,pageNumber:' + 1 + '" aria-label="Previous"> <span aria-hidden="true">&laquo;</span> </a>'));
+        for (var i = 1; i <= page_sum; i++) {
+          class_name = ((page_number == i) ? 'active' : '');
+          // 为了让每个翻页按钮大小相同，在这里给数值小的文本添加空格进行点位
+          var text = i;
+          var start = String(i).length;
+          var end = String(page_sum).length;
+          console.debug('i.length=' + start + ', page_sum.length=' + end);
+          for (var space_count = start; space_count <= end; space_count++) {
+            text = '&nbsp;' + text + '&nbsp;';
+          };
+
+          pagination.append($('<li/>').addClass(class_name).html('<a onclick="pageComment(this);" data-options="pageSize:' + page_size + ' ,pageNumber:' + i + '">' + text + '</a>'));
+        };
+        class_name = ((page_number == page_sum) ? 'disabled' : '');
+        // pagination.append($('<li/>').addClass(class_name).html('<a onclick="pageComment(this);" data-options="pageSize:' + page_size + ' ,pageNumber:' + page_sum + '" aria-label="Next"> <span aria-hidden="true">&raquo;</span> </a>'));
+      }
+      commmentlist.append($('<nav/>').append(pagination));
     }// callback
   );
 }
 </script>
 
 <script type="text/javascript">
+
+;(function($) {
+  $.ltrim = function(str, char_trim) {
+    var start = 0;
+    var stop = str.length;
+    while (str[start] == char_trim) {
+      start++;
+    }
+    return str.substring(start, stop);
+  };
+  $.rtrim = function(str, char_trim) {
+    var start = 0;
+    var stop = str.length;
+    while (str[stop-1] == char_trim) {
+      stop--;
+    }
+    return str.substring(start, stop);
+  };
+})(jQuery);
+
 </script>
 @stop

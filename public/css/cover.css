@@ -136,8 +136,10 @@ body {
     top: 0;
   }
   .mastfoot {
+/*
     position: fixed;
-    bottom: 0;
+    bottom: 0; 去除浮动
+*/
   }
   /* Start the vertical centering */
   .site-wrapper-inner {
@@ -189,4 +191,12 @@ body {
   /* 在 site-background 后设置 body 为黑色背景，才能使界面 shadow 变成黑色*/
   /* 如果在 site-background 前设置 body为黑色背景，就看不到 site-background 的北京图片了 */
   /* 暂时不理解为什么？ */
+}
+
+/*使结尾的作者信息水平居中显示*/
+.mastfoot-ext {
+  left: 50%;
+  top: 50%;
+  width: auto;
+  height: auto;
 }
