@@ -175,6 +175,7 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+  background-size: cover;
   background-image: url(../img/hand.jpg);
   background-repeat:no-repeat;
   width: 100%;
@@ -187,7 +188,7 @@ body {
 }
 
 body {
-  background: black; 
+  background: #333; 
   /* 在 site-background 后设置 body 为黑色背景，才能使界面 shadow 变成黑色*/
   /* 如果在 site-background 前设置 body为黑色背景，就看不到 site-background 的北京图片了 */
   /* 暂时不理解为什么？ */
