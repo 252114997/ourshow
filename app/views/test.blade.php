@@ -9,6 +9,10 @@
     <meta name="author" content="">
 	<link rel="shortcut icon" href="{{ asset('logo.ico') }}">
   
+  <!-- Bootstrap core CSS -->
+ 
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.css') }}">
+
   <link rel="stylesheet" type="text/css" href="{{ asset('css/ouershow.css') }}">
 
     <!-- Bootstrap core CSS -->
@@ -24,36 +28,64 @@
 
     <title>Carousel Template for Bootstrap</title>
 </head>
-<body class="home-template">
+<body >
 
-
-<header class="main-header " style="background-image: url(http://image.golaravel.com/5/c9/44e1c4e50d55159c65da6a41bc07e.jpg)">
-    <nav class="main-nav overlay clearfix">
-        <a class="blog-logo" href="http://www.golaravel.com"><img src="http://image.golaravel.com/5/ff/ccd6322336f7401d95c963a1b4e0b.png" alt="Blog Logo" /></a>
-        <a class="subscribe-button icon-feed" href="http://www.golaravel.com/rss/">订阅</a>
-    </nav>
-    <div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">为 WEB 艺术家创造的 PHP 框架。</h1>
-            <h2 class="page-description">PHP THAT DOESN'T HURT. CODE HAPPY & ENJOY THE FRESH AIR.</h2>
-        </div>
-        <div class="callto">
-            <div class="new-docs">
-                <a href="http://lumen.golaravel.com/docs/" class="doc-button" target="_blank">Lumen 中文文档</a>
-                <a href="http://www.golaravel.com/laravel/docs/5.0/" class="doc-button new" target="_blank">5.0 中文文档</a>
-                <a href="http://www.golaravel.com/laravel/docs/4.2/" class="doc-button" target="_blank">4.2 中文文档</a>
-                <a href="http://www.golaravel.com/laravel/docs/4.1/" class="doc-button" target="_blank">4.1 中文文档</a>
-                <a href="http://www.golaravel.com/laravel/docs/4.0/" class="doc-button" target="_blank">4.0 中文文档</a>
-                <a href="http://wenda.golaravel.com" class="doc-button" target="_blank">问答社区</a>
+    <div class="picplayer boxline">
+        <div class="picplayer-content boxline">
+            <div class="picplayer-canvas">
+                <div class="item" >
+                  <img class="image" src="img/timeline/Hydrangeas.jpg" alt="Hydrangeas">
+                  <div class="caption">
+                    <h1>One more for good measure.</h1>
+                    <p><a class="btn btn-lg btn-primary" href="#" role="button">Browse gallery</a></p>
+                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                  </div>
+                </div>
             </div>
+            <a class="picplayer-control-left boxline_red">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            
+            <a class="picplayer-control-right boxline_red">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
 
-            <div class="old-docs">
-                <a id="old-link" href="http://v3.golaravel.com/">Laravel 3.2 中文文档</a>
-            </div>
         </div>
+
+        <div class="picplayer-process boxline">
+          <!-- Indicators -->
+          <ol class="boxline_blue">
+            <li style="left:0%" position="0" data-slide-to="0" class="active">
+              <a>
+                <strong>2015-06-28</strong>
+                <img src="logo.ico" alt="Hydrangeas">
+              </a>
+            </li>
+            <li style="left:10%" position="1">
+              <a>
+                <strong>2015-07-28</strong>
+                <img src="logo.ico" alt="Hydrangeas">
+              </a>
+            </li>
+            <li style="left:30%" position="3">
+              <a>
+                <strong>2015-09-28</strong>
+                <img src="logo.ico" alt="Hydrangeas">
+              </a>
+            </li>
+            <li style="left:100%" position="50">
+              <a>
+                <strong>2015-09-29</strong>
+                <img src="img/timeline/Hydrangeas.jpg" alt="Hydrangeas">
+              </a>
+            </li>
+          </ol>
+ 
+        </div>
+
     </div>
-    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">下拉显示</span></a>
-</header>
 
 </body>
 </html>
