@@ -8,14 +8,14 @@ class MainFrameController extends BaseController {
 		}
 
 		if (Request::isMethod('get')) {
-			$user_id = Input::get('user_id', null);
+			$user_id = Input::get('id', null);
 			if (null != $user_id) {
 				$response = Response::make(View::make('login'));
 				$response->withCookie(Cookie::make('user_id', $user_id));
 				return $response;
 			}
 			return View::make('login')
-				->with('error_info', '需要邀请码才能访问啊喂！请点击 短信/微信/QQ 中的链接地址访问');
+				->with('deny_info', '需要邀请码啊喂！请点击 短信/微信/QQ 中的链接地址访问！');
 		}
 
 		if (!Request::isMethod('post')) {
