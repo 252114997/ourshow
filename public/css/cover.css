@@ -189,29 +189,32 @@ body {
     position: absolute;
     bottom: 50%;
     right: 50%;
+
+    -moz-transform: translateX(50%) translateY(50%);
+    -webkit-transform: translateX(50%) translateY(50%);
+    -o-transform: translateX(50%) translateY(50%);
+    -ms-transform: translateX(50%) translateY(50%);
     transform: translateX(50%) translateY(50%);
-    
+
     background-color: rgba(0,0,0,0.3);
     border-radius: 0.5em;
+
+    padding: 10px;
+    max-height: 90%;
+    max-width: 90%;
 }
 
 /*如果目标是纵向模式智能手机，则使用：*/
 @media (max-width: 320px) { 
     .cover-inner-my {
-      min-height: 80%;
       min-width: 90%;
-      max-height: 100%;
-      max-width: 100%;
     }
 }
 
 /*如果目标是横向模式智能手机，则使用： */
 @media (min-width: 321px) { 
     .cover-inner-my {
-      min-height: 60%;
-      min-width: 90%;
-      max-height: 100%;
-      max-width: 100%;
+      min-width: 80%;
     }
 }
 
@@ -219,24 +222,24 @@ body {
 /*@media (orientation: portrait) { */
 @media (min-width: 641px) and (max-width:770px){
     .cover-inner-my {
-      min-height: 50%;
-      min-width: 50%;
-      max-height: 70%;
-      max-width: 80%;
+      min-width: 75%;
     }
 }
 
 /*如果目标是横向模式 Apple iPad，则使用： */
 /*@media (orientation: landscape) { */
-@media (min-width: 771px){
+@media (min-width: 771px) and (max-width:1024px){
     .cover-inner-my {
-      min-height: 50%;
-      min-width: 40%;
-      max-height: 90%;
-      max-width: 50%;
+      min-width: 65%;
     }
 }
 
+/*如果目标是笔记本、台式机，则使用： */
+@media (min-width: 1025px){
+    .cover-inner-my {
+      min-width: 50%;
+    }
+}
 
 /** 
  * @brief 展示背景图

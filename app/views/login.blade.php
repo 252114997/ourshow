@@ -3,7 +3,6 @@
 @section('css')
 
   <link rel="stylesheet" type="text/css" href="{{ asset('css/cover.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/timeline.css') }}">
 
 @stop
 
@@ -12,23 +11,29 @@
 
     <div class="site-background filter-blur">
     </div>
-    <div class="site-wrapper" >
 
-      <div class="site-wrapper-inner">
+    <div class="cover-continer-my" >
 
-        <div class="cover-container" >
+          <div class="cover-inner-my" >
 
-          <div class="inner cover" >
+          @if (isset($deny_info))
 
-            <form id="input_form" class="form-horizontal" 
-              method="post" action='{{ URL::to("/login") }}'>
-<!-- 
+            <form class="form-horizontal" >
               <div class="form-group">
                 <div class="col-sm-12">
-                  <h4 class="text-center">输入邀请码才能浏览</h4>
+                    <h2 class="text-danger">
+                      需要邀请码啊喂！
+                    </h2>
+                    <h3 class="text-danger">
+                      请点击 短信/微信/QQ 中的链接地址访问！
+                    </h3>
                 </div>
               </div>
- -->
+            </form>
+
+          @else
+
+            <form class="form-horizontal" method="post" action='{{ URL::to("/login") }}'>
 
               <div class="form-group">
                 <div class="col-sm-12">
@@ -37,36 +42,31 @@
                       {{ Session::get('error_info') }}
                     </p>
                   @endif
-                  @if (isset($error_info))
-                    <p class="lead text-danger">
-                      {{ $error_info }}
-                    </p>
-                  @endif
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="inputToken" class="col-sm-2 control-label">邀请码：</label>
-                <div class="col-sm-10">
+                <label for="inputToken" class="col-xs-12 col-sm-2 control-label text-left">邀请码：</label>
+                <div class="col-xs-12 col-sm-10">
                   <input type="text" class="form-control" id="inputToken" name="token" placeholder="邀请码" 
                     value="">
                 </div>
               </div>
 
               <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-2"> 
-                  <button type="submit" class="btn btn-primary">登录</button>
+                <div class="col-xs-12 col-sm-offset-2 col-sm-2"> 
+                  <button type="submit" class="pull-left btn btn-primary">登录</button>
                 </div>
               </div>
 
             </form>
 
+          @endif
           </div>
 
-        </div>
-
-      </div>
-
+          <div class="footer-info">
+            <p>由<a > WS & TT </a>提供强劲技术支持</p>
+          </div>
     </div>
 
     <style type="text/css">
