@@ -6,6 +6,7 @@ class UserAuthController extends Controller {
 		return !self::isLogin();
 	}
 	static public function isLogin() {
+		// self::logout();
 		if (null == Session::get('user_token.user_id', null)) {
 			return false;
 		}
