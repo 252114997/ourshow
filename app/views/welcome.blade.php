@@ -6,6 +6,7 @@
   <link rel="stylesheet" type="text/css" href="{{ asset('css/timeline.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/comment.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/bounce.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/ouershow.css') }}">
 
 @stop
 
@@ -53,8 +54,8 @@
                     <h4 class="timeline-title">{{ $ablum['title'] }}</h4>
                   </div>
 
-                  <div class="timeline-body">
-                    <img src="{{ $ablum['picture_id']['path'] }}" style="width:100%;"
+                  <div class="timeline-body" onclick="showPictureWall(this);">
+                    <img src="{{ $ablum['picture_id']['path'] }}" style="width:100%;" 
                       class="{{ rand(0,1) ? 'img-circle' : 'img-rounded' }}" />
                     @if ($ablum['caption'])
                       <p class="caption">{{ $ablum['caption'] }}</p>
@@ -85,8 +86,32 @@
         </ul>
     </div>
 
-    <div class="mastfoot mastfoot-ext">
+    <div id="footer_info" class="mastfoot mastfoot-ext">
         <p>由<a > WS & TT </a>提供强劲技术支持</p>
+    </div>
+
+
+    <div id="picture_player" class="picplayer boxline" style="display:none;">
+        <div class="picplayer-content boxline">
+            <div class="picplayer-canvas" >
+                <div class="item" >
+                  <img class="image" src="img/timeline/Hydrangeas.jpg" data-liid="" onclick="hidePictureWall(this);">
+                  <h2 class="caption">
+                  </h2>
+                </div>
+            </div>
+            <a class="picplayer-control-left" data-liid="" onclick="showPictureWallLeft(this);">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            
+            <a class="picplayer-control-right" data-liid="" onclick="showPictureWallRight(this);">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+
+        </div>
+
     </div>
 
 @stop
@@ -104,8 +129,23 @@ $(function(){
 
   // 工具栏提示
   $('[data-toggle="tooltip"]').tooltip();
+
+  // 触屏界面中左右滑动时切换图片
+  $('#picture_player')
+  .on("swipeleft",function(){
+    $('#picture_player .picplayer-control-right').trigger('click');
+    console.log('swipeleft');
+  })
+  .on("swiperight",function(){
+    $('#picture_player .picplayer-control-left').trigger('click');
+    console.log('swiperight');
+  });
+
 });
 
+/**
+ * @brief 实现点赞按钮
+ */
 function doLikeit(button, likeit) {
   if (likeit) {
     button.removeClass('heart-unlike').addClass('heart-like');
@@ -143,6 +183,9 @@ function likeAblum (button, ablum_id) {
   return true;
 }
 
+/**
+ * @brief 实现评论功能
+ */
 function addComment (button, ablum_id) {
   var comment = $(button).prev('input').val();
   $(button).prev('input').focus();
@@ -254,10 +297,108 @@ function reloadComment(commmentlist) {
     }// callback
   );
 }
+
+/**
+ * @brief 显示、隐藏 照片墙（浏览大图）
+ */
+function hidePictureWall(image) {
+  if ( $('#picture_player .picplayer-control-left').hasClass('hidden_element')
+    || $('#picture_player .picplayer-control-right').hasClass('hidden_element')
+  ) {
+    showPicplayerControl();
+    return false;
+  }
+
+  // $('body').css('overflow', 'auto');
+  $("body > div[id!='picture_player']").show();
+  $("body > div[id='picture_player']").hide();
+
+  var liid = $(image).attr('data-liid');
+  location.href = '#' + liid;
+
+}
+
+var timer_ptr = $.timer(
+  function() {
+    console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
+    $('#picture_player > .picplayer-content > .picplayer-control-left').addClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-control-right').addClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').addClass('hidden_element');
+    timer_ptr.stop();
+  },
+  5 * 1000,
+  false
+);
+
+function showPicplayerControl() {
+    $('#picture_player > .picplayer-content > .picplayer-control-left').removeClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-control-right').removeClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').removeClass('hidden_element');
+    // 使用定时器，将左右按钮隐藏
+    timer_ptr.stop();
+    timer_ptr.play();
+}
+
+function showPictureWall(timeline_body) {
+  // $('body').css('overflow', 'hidden');
+  $("body > div[id='picture_player']").show();
+  $("body > div[id!='picture_player']").hide();
+
+  showPictureWallTimelineItem($(timeline_body).closest('li'));
+
+  showPicplayerControl();
+}
+
+function showPictureWallLeft(picplayer_control) {
+  var liid = $(picplayer_control).attr('data-liid');
+  showPictureWallTimelineItem($('#' + liid));
+}
+
+function showPictureWallRight(picplayer_control) {
+  var liid = $(picplayer_control).attr('data-liid');
+  showPictureWallTimelineItem($('#' + liid));
+}
+
+function showPictureWallTimelineItem(timeline_item) {
+  var timeline_item = $(timeline_item);
+  var timeline_body = timeline_item.find('.timeline-panel > .timeline-body');
+  var image_src = timeline_body.find('img').attr('src');
+  var image_caption = timeline_body.find('.caption').html();
+  var li_id = timeline_item.attr('id');
+  var li_id_prev = timeline_item.prev('li').attr('id');
+  var li_id_next = timeline_item.next('li').attr('id');
+
+  // 切换显示图片，前/后一张 按钮上的 list item id
+  var picture_player = $('#picture_player > .picplayer-content');
+  var cur_item = picture_player.find('.picplayer-canvas > .item');
+  cur_item.find('img').attr('src', image_src);
+  cur_item.find('img').attr('data-liid', li_id);
+  cur_item.find('.caption').html(image_caption);
+  picture_player.find('.picplayer-control-left').attr('data-liid', li_id_prev);
+  picture_player.find('.picplayer-control-right').attr('data-liid', li_id_next);
+
+  // 如果没有 前/后一张 则隐藏相关按钮
+  if (null == li_id_prev) {
+    picture_player.find('.picplayer-control-left').hide();
+  }
+  else {
+    picture_player.find('.picplayer-control-left').show();
+  }
+  if (null == li_id_next) {
+    picture_player.find('.picplayer-control-right').hide();
+  }
+  else {
+    picture_player.find('.picplayer-control-right').show();
+  }
+}
+
 </script>
 
 <script type="text/javascript">
 
+/**
+ * @brief 扩展jQuery函数，用于去除字符串左右的指定字符
+ */
 ;(function($) {
   $.ltrim = function(str, char_trim) {
     var start = 0;

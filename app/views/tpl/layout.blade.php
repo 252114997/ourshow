@@ -40,6 +40,8 @@
 
 	<script src="{{ asset('js/jquery.timer.js') }}"></script>
 
+    <script src="{{ asset('js/jquery.mobile.custom.min.js') }}"></script>
+
 	@yield('js')
 
 </body>
