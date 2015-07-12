@@ -185,6 +185,19 @@ body {
   height: 100%; /* For at least Firefox */
 }
 
+.cover-inner-my:hover {
+  cursor: pointer;
+  background-color: rgba(0,0,0, 0.5);
+}
+.cover-inner-my:active {
+  background-color: rgba(0,0,0, 0.6);
+  box-shadow: 2px 2px 9px rgba(0,0,0,0.7);
+}
+.cover-inner-my:hover > p,
+.cover-inner-my:hover > h1 {
+  cursor: auto;
+}
+
 .cover-inner-my {
     position: absolute;
     bottom: 50%;
@@ -196,8 +209,9 @@ body {
     -ms-transform: translateX(50%) translateY(50%);
     transform: translateX(50%) translateY(50%);
 
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.4);
     border-radius: 0.5em;
+    box-shadow: 2px 2px 9px rgba(0,0,0,0.7);
 
     padding: 10px;
     max-height: 90%;
@@ -287,3 +301,4 @@ body {
   width: 100%;
   text-align: center;
 }
+
