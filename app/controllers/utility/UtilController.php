@@ -734,6 +734,17 @@ class Util {
 		}
 		return file_put_contents("$dir/$file", $contents);
 	}
+
+	/**
+	 * @brief Data URI scheme
+	 */
+	static public function getDataURI($image, $mime = '') {
+		return 
+			'data: '
+			.(function_exists('mime_content_type') ? mime_content_type($image) : $mime)
+			.';base64,'
+			.base64_encode(file_get_contents($image));
+	}
 }
 
 class UtilController extends BaseController {

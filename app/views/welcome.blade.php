@@ -55,7 +55,7 @@
                   </div>
 
                   <div class="timeline-body" onclick="showPictureWall(this);">
-                    <img src="{{ $ablum['picture_id']['path'] }}" style="width:100%;" 
+                    <img src='{{ URL::to("/get-picture")."/".$ablum["picture_id"]["id"] }}' style="width:100%;" 
                       class="{{ rand(0,1) ? 'img-circle' : 'img-rounded' }}" />
                     @if ($ablum['caption'])
                       <p class="caption">{{ $ablum['caption'] }}</p>
@@ -92,10 +92,10 @@
 
 
     <div id="picture_player" class="picplayer boxline" style="display:none;">
-        <div class="picplayer-content boxline">
+        <div class="picplayer-content boxline" onclick="showPicplayerControl(this);">
             <div class="picplayer-canvas" >
                 <div class="item" >
-                  <img class="image" src="img/timeline/Hydrangeas.jpg" data-liid="" onclick="hidePictureWall(this);">
+                  <img class="image" src="TODO" data-liid="" onclick="hidePictureWall(this);">
                   <h2 class="caption">
                   </h2>
                 </div>
@@ -304,6 +304,7 @@ function reloadComment(commmentlist) {
 function hidePictureWall(image) {
   if ( $('#picture_player .picplayer-control-left').hasClass('hidden_element')
     || $('#picture_player .picplayer-control-right').hasClass('hidden_element')
+    || $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').hasClass('hidden_element')
   ) {
     showPicplayerControl();
     return false;
@@ -371,7 +372,7 @@ function showPictureWallTimelineItem(timeline_item) {
   // 切换显示图片，前/后一张 按钮上的 list item id
   var picture_player = $('#picture_player > .picplayer-content');
   var cur_item = picture_player.find('.picplayer-canvas > .item');
-  cur_item.find('img').attr('src', image_src);
+  cur_item.find('img').attr('src', image_src + '?width=' + $(window).width() + '&height=' + $(window).height());
   cur_item.find('img').attr('data-liid', li_id);
   cur_item.find('.caption').html(image_caption);
   picture_player.find('.picplayer-control-left').attr('data-liid', li_id_prev);

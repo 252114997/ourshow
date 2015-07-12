@@ -1,9 +1,94 @@
 <?php
 
 class MainFrameController extends BaseController {
+	/**
+	 * @brief 返回照片，可指定参数进行缩放
+	 * @return image
+	 */
+	public function getPicture($picture_id) {
+		$time_start = microtime(true);
+
+		$item = tb_pictures::find($picture_id);
+		if (null == $item) {
+			// not found;
+			return;
+		}
+		$max_length = max(intval(Input::get('height', 320)), intval(Input::get('width', 320)));
+		$length_array = array(320, 640, 770, 1024);
+		foreach ($length_array as $key => $value) {
+			if ($max_length <= $value) {
+				$max_length = $value;
+				break;
+			}
+		}
+
+		$param = array();
+	    $param['path'] = $item['path'];
+		$param['height'] = $max_length;
+		$param['width']  = $max_length;
+		Util::log_debug(json_encode($param));
+
+		$content_datas = array();
+		$use_cache = intval(Input::get('cache', 1));
+		if ($use_cache) {
+			Util::log_debug("use_cache!");
+			$content_datas = Cache::rememberForever(json_encode($param), function() use ($param) {
+				// 使用cache提高性能
+				Util::log_debug("use_cache! in cache first get");
+				$content = self::scaleImageFileToBlob($param);
+				return array(
+					'last_modified_time' => time(),
+					'etag' => md5($content),
+					'content' => $content,
+				);
+			});
+		}
+		else {
+			$content = self::scaleImageFileToBlob($param);
+			$content_datas = array(
+				'last_modified_time' => time(),
+				'etag' => md5($content),
+				'content' => $content,
+			);
+		}
+
+		$time_end = microtime(true);
+		$time = $time_end - $time_start;
+		Util::log_debug("Get image in $time seconds.");
+
+		$http_header = array(
+			"Last-Modified" => $content_datas['last_modified_time'],
+			"Etag" => $content_datas['etag'],
+		);
+		// var_dump(Request::header()); die;
+
+		Util::log_debug(" HTTP_IF_MODIFIED_SINCE = ".Request::header('If-Modified-Since'));
+		Util::log_debug(" HTTP_IF_NONE_MATCH = ".Request::header('If-None-Match'));
+		if (@strtotime(Request::header('If-Modified-Since')) == $content_datas['last_modified_time'] || 
+			trim(Request::header('If-None-Match')) == $content_datas['etag']) { 
+			Util::log_debug(" http 304 ");
+			return Response::make('', 304, $http_header);
+			// return App::abort(304);
+		}
+
+		Util::log_debug(" http 200 ");
+
+		$http_header += array(
+			"Content-Type" => image_type_to_mime_type(exif_imagetype($param['path'])), //"image/x-png",
+			"Content-Length" => strlen($content_datas['content']),
+		);
+		return Response::make($content_datas['content'], 200, $http_header);
+	}
 
 	public function login()	{
 		if (UserAuthController::isLogin()) {
+			new ResizeImage(
+				('img/timeline/Penguins.jpg'),
+				400, 400,
+				0,
+				('img/timeline/100_100_Penguins.jpg'),
+				100
+			);
 			return Redirect::to('/welcome');
 		}
 
@@ -194,6 +279,75 @@ class MainFrameController extends BaseController {
 
 		return array('rows' => $items, 'count' => $total);
 		// return $items;
+	}
+
+	/**
+	 * @brief 返回经过缩放后的图片数据
+	 *
+	 * reference: http://php.net/manual/zh/function.imagejpeg.php
+	 */
+	static public function scaleImageFileToBlob($param) {
+	    $source_pic = $param['path'];
+	    $max_width  = $param['width'];
+	    $max_height = $param['height'];
+
+	    list($width, $height, $image_type) = getimagesize($source_pic);
+
+	    switch ($image_type)
+	    {
+	        case 1: $src = imagecreatefromgif($source_pic); break;
+	        case 2: $src = imagecreatefromjpeg($source_pic);  break;
+	        case 3: $src = imagecreatefrompng($source_pic); break;
+	        default: return '';  break;
+	    }
+
+	    $x_ratio = $max_width / $width;
+	    $y_ratio = $max_height / $height;
+
+	    if( ($width <= $max_width) && ($height <= $max_height) ){
+	        $tn_width = $width;
+	        $tn_height = $height;
+	        }elseif (($x_ratio * $height) < $max_height){
+	            $tn_height = ceil($x_ratio * $height);
+	            $tn_width = $max_width;
+	        }else{
+	            $tn_width = ceil($y_ratio * $width);
+	            $tn_height = $max_height;
+	    }
+
+	    $tmp = imagecreatetruecolor($tn_width,$tn_height);
+
+	    /* Check if this image is PNG or GIF, then set if Transparent*/
+	    if(($image_type == 1) OR ($image_type==3))
+	    {
+	        imagealphablending($tmp, false);
+	        imagesavealpha($tmp,true);
+	        $transparent = imagecolorallocatealpha($tmp, 255, 255, 255, 127);
+	        imagefilledrectangle($tmp, 0, 0, $tn_width, $tn_height, $transparent);
+	    }
+	    imagecopyresampled($tmp,$src,0,0,0,0,$tn_width, $tn_height,$width,$height);
+
+	    /*
+	     * imageXXX() only has two options, save as a file, or send to the browser.
+	     * It does not provide you the oppurtunity to manipulate the final GIF/JPG/PNG file stream
+	     * So I start the output buffering, use imageXXX() to output the data stream to the browser, 
+	     * get the contents of the stream, and use clean to silently discard the buffered contents.
+	     */
+	    ob_start();
+
+	    switch ($image_type)
+	    {
+	        case 1: imagegif($tmp); break;
+	        case 2: imagejpeg($tmp, NULL, 100);  break; // best quality
+	        case 3: imagepng($tmp, NULL, 0); break; // no compression
+	        default: echo ''; break;
+	    }
+
+	    $final_image = ob_get_contents();
+
+	    ob_end_clean();
+
+	    return $final_image;
 	}
 
 }

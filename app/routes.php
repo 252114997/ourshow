@@ -30,4 +30,6 @@ Route::group(array('before' => 'auth'), function() {
 	Route::post('/add-comments/{ablum_id}', 'MainFrameController@addComments');
 
 	Route::post('/switch-like/{ablum_id}/{likeit}', 'MainFrameController@switchLike');
+
+	Route::get('/get-picture/{picture_id}', 'MainFrameController@getPicture');
 });
