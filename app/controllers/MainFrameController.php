@@ -1,81 +1,46 @@
 <?php
 
 class MainFrameController extends BaseController {
+
+	/**
+	 * @brief 返回background图片，可指定参数进行缩放
+	 * @return image
+	 */
+	public function getBackground($filename) {
+		$directory = 'img/background/';
+		$path = $directory.$filename;
+		if (!file_exists($path)) {
+			return;
+		}
+
+		$param = array();
+		$param['path'] = $path;
+		$param['height'] = intval(Input::get('height', 320));
+		$param['width']  = intval(Input::get('width', 320));
+		$param['use_cache'] = intval(Input::get('cache', 1));
+
+		return self::returnCacheImage($param);
+	}
+
+
 	/**
 	 * @brief 返回照片，可指定参数进行缩放
 	 * @return image
 	 */
 	public function getPicture($picture_id) {
-		$time_start = microtime(true);
-
 		$item = tb_pictures::find($picture_id);
 		if (null == $item) {
 			// not found;
 			return;
 		}
-		$max_length = max(intval(Input::get('height', 320)), intval(Input::get('width', 320)));
-		$length_array = array(320, 640, 770, 1024);
-		foreach ($length_array as $key => $value) {
-			if ($max_length <= $value) {
-				$max_length = $value;
-				break;
-			}
-		}
 
 		$param = array();
 		$param['path'] = $item['path'];
-		$param['height'] = $max_length;
-		$param['width']  = $max_length;
-		Util::log_debug(json_encode($param));
+		$param['height'] = intval(Input::get('height', 320));
+		$param['width']  = intval(Input::get('width', 320));
+		$param['use_cache'] = intval(Input::get('cache', 1));
 
-		$content_datas = array();
-		$use_cache = intval(Input::get('cache', 1));
-		if ($use_cache) {
-			Util::log_debug("use_cache!");
-			$content_datas = Cache::rememberForever(json_encode($param), function() use ($param) {
-				// 使用cache提高性能
-				Util::log_debug("use_cache! in cache first get");
-				$content = self::scaleImageFileToBlob($param);
-				return array(
-					'last_modified_time' => time(),
-					'etag' => md5($content),
-					'content' => $content,
-				);
-			});
-		}
-		else {
-			$content = self::scaleImageFileToBlob($param);
-			$content_datas = array(
-				'last_modified_time' => time(),
-				'etag' => md5($content),
-				'content' => $content,
-			);
-		}
-
-		$time_end = microtime(true);
-		$time = $time_end - $time_start;
-		Util::log_debug("Get image in $time seconds.");
-
-		// 请求重复内容，使用304跳转，提高速度
-		$http_header = array(
-			"Last-Modified" => $content_datas['last_modified_time'],
-			"Etag" => $content_datas['etag'],
-		);
-		Util::log_debug(" HTTP_IF_MODIFIED_SINCE = ".Request::header('If-Modified-Since'));
-		Util::log_debug(" HTTP_IF_NONE_MATCH = ".Request::header('If-None-Match'));
-		if (@strtotime(Request::header('If-Modified-Since')) == $content_datas['last_modified_time'] || 
-			trim(Request::header('If-None-Match')) == $content_datas['etag']) { 
-			Util::log_debug(" http 304 ");
-			return Response::make('', 304, $http_header);
-			// return App::abort(304);
-		}
-
-		Util::log_debug(" http 200 ");
-		$http_header += array(
-			"Content-Type" => image_type_to_mime_type(exif_imagetype($param['path'])), //"image/x-png",
-			"Content-Length" => strlen($content_datas['content']),
-		);
-		return Response::make($content_datas['content'], 200, $http_header);
+		return self::returnCacheImage($param);
 	}
 
 	public function login()	{
@@ -138,8 +103,18 @@ class MainFrameController extends BaseController {
 			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
 		}
 
+		// 随机播放图片
+		$directory = 'img/background';
+		$scanned_directory = array_diff(scandir($directory), array('..', '.'));
+
 		return View::make('welcome')
-			->with('param', $items);
+			->with(
+				'param', 
+				array(
+					'ablums' => $items, 
+					'random_backgrounds' => $scanned_directory,
+				)
+			);
 	}
 
 
@@ -260,6 +235,70 @@ class MainFrameController extends BaseController {
 		// return $items;
 	}
 
+	// $param = array();
+	// $param['path'] = $item['path'];
+	// $param['height'] = $max_length;
+	// $param['width']  = $max_length;
+	// $param['use_cache'] = intval(Input::get('cache', 1));
+	static public function returnCacheImage($param) {
+		$max_length = max($param['height'], $param['width']);
+		$length_array = array(320, 640, 770, 1024);
+		foreach ($length_array as $key => $value) {
+			if ($max_length <= $value) {
+				$max_length = $value;
+				break;
+			}
+		}
+		$param['height'] = $max_length;
+		$param['width']  = $max_length;
+
+		Util::log_debug(json_encode($param));
+
+		$content_datas = array();
+		if ($param['use_cache']) {
+			Util::log_debug("use_cache!");
+			$content_datas = Cache::rememberForever(json_encode($param), function() use ($param) {
+				// 使用cache提高性能
+				Util::log_debug("use_cache! in cache first get");
+				$content = self::scaleImageFileToBlob($param);
+				return array(
+					'last_modified_time' => time(),
+					'etag' => md5($content),
+					'content' => $content,
+				);
+			});
+		}
+		else {
+			$content = self::scaleImageFileToBlob($param);
+			$content_datas = array(
+				'last_modified_time' => time(),
+				'etag' => md5($content),
+				'content' => $content,
+			);
+		}
+
+		// 请求重复内容，使用304跳转，提高速度
+		$http_header = array(
+			"Last-Modified" => $content_datas['last_modified_time'],
+			"Etag" => $content_datas['etag'],
+		);
+		Util::log_debug(" HTTP_IF_MODIFIED_SINCE = ".Request::header('If-Modified-Since'));
+		Util::log_debug(" HTTP_IF_NONE_MATCH = ".Request::header('If-None-Match'));
+		if (@strtotime(Request::header('If-Modified-Since')) == $content_datas['last_modified_time'] || 
+			trim(Request::header('If-None-Match')) == $content_datas['etag']) { 
+			Util::log_debug(" http 304 ");
+			return Response::make('', 304, $http_header);
+			// return App::abort(304);
+		}
+
+		Util::log_debug(" http 200 ");
+		$http_header += array(
+			"Content-Type" => image_type_to_mime_type(exif_imagetype($param['path'])), //"image/x-png",
+			"Content-Length" => strlen($content_datas['content']),
+		);
+		return Response::make($content_datas['content'], 200, $http_header);
+	}
+
 	/**
 	 * @brief 返回经过缩放后的图片数据
 	 *
@@ -317,8 +356,8 @@ class MainFrameController extends BaseController {
 	    switch ($image_type)
 	    {
 	        case 1: imagegif($tmp); break;
-	        case 2: imagejpeg($tmp, NULL, 100);  break; // best quality
-	        case 3: imagepng($tmp, NULL, 0); break; // no compression
+	        case 2: imagejpeg($tmp, NULL, 75);  break; // best quality
+	        case 3: imagepng($tmp, NULL, 8); break; // no compression
 	        default: echo ''; break;
 	    }
 

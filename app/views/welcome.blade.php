@@ -17,7 +17,7 @@
 
     <div class="cover-continer-my" >
 
-          <div class="cover-inner-my" >
+          <div class="cover-inner-my" onclick="shuffleBackground();" >
             <h1 class="cover-heading">见证我们爱情</h1>
             <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
             <p class="lead">时间：2015-05-03 11:00</p>
@@ -39,7 +39,7 @@
         </div>
         <ul class="timeline">
 
-            @foreach ($param as $index => $ablum) 
+            @foreach ($param['ablums'] as $index => $ablum) 
               <li id="ablum_{{ $ablum['id'] }}" class="{{ ($index%2) ? 'timeline-inverted' : '' }}">
                 
                 <div class=" timeline-badge {{ $ablum['likeit'] ? 'heart-like' : 'heart-unlike' }}" 
@@ -92,10 +92,10 @@
 
 
     <div id="picture_player" class="picplayer boxline" style="display:none;">
-        <div class="picplayer-content boxline" onclick="showPicplayerControl(this);">
+        <div class="picplayer-content boxline" onclick="showPicplayerControl(this); return false;">
             <div class="picplayer-canvas" >
                 <div class="item" >
-                  <img class="image" src="TODO" data-liid="" onclick="hidePictureWall(this);">
+                  <img class="image" src="" data-liid="" onclick="hidePictureWall(this);">
                   <h2 class="caption">
                   </h2>
                 </div>
@@ -121,7 +121,27 @@
 
 <script type="text/javascript">
 
+/**
+ * @brief 随机更换背景
+ */
+function shuffleBackground() {
+  console.debug("shuffleBackground()");
+
+  var random_backgrounds = {{ json_encode(array_values($param['random_backgrounds'])) }};
+  var max_num = random_backgrounds.length;
+  var shuffleNum = function() { 
+    return Math.floor(Math.random()*max_num); // 0 - max_num 间的随机数
+  };
+  var index = shuffleNum();
+  $('div.site-background').css(
+    "background-image", 
+    'url( {{ URL::to("/get-background") }}/' + random_backgrounds[index] + '?width=' + $(window).width() + '&height=' + $(window).height() +' )'
+  );
+}
+
 $(function(){
+  shuffleBackground();
+
   // 相册评论列表
   $('ul.ourshow-commmentlist').each(function(index, elem){
     reloadComment($(elem));
@@ -302,6 +322,8 @@ function reloadComment(commmentlist) {
  * @brief 显示、隐藏 照片墙（浏览大图）
  */
 function hidePictureWall(image) {
+
+  console.debug("hidePictureWall()");
   if ( $('#picture_player .picplayer-control-left').hasClass('hidden_element')
     || $('#picture_player .picplayer-control-right').hasClass('hidden_element')
     || $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').hasClass('hidden_element')
@@ -322,9 +344,9 @@ function hidePictureWall(image) {
 var timer_ptr = $.timer(
   function() {
     console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
-    $('#picture_player > .picplayer-content > .picplayer-control-left').addClass('hidden_element');
-    $('#picture_player > .picplayer-content > .picplayer-control-right').addClass('hidden_element');
-    $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').addClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-control-left').addClass('hidden_element').css('pointer-events', 'none');
+    $('#picture_player > .picplayer-content > .picplayer-control-right').addClass('hidden_element').css('pointer-events', 'none');
+    $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').addClass('hidden_element').css('pointer-events', 'none');
     timer_ptr.stop();
   },
   5 * 1000,
@@ -332,15 +354,19 @@ var timer_ptr = $.timer(
 );
 
 function showPicplayerControl() {
-    $('#picture_player > .picplayer-content > .picplayer-control-left').removeClass('hidden_element');
-    $('#picture_player > .picplayer-content > .picplayer-control-right').removeClass('hidden_element');
-    $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').removeClass('hidden_element');
+  console.debug("showPicplayerControl()");
+
+    $('#picture_player > .picplayer-content > .picplayer-control-left').css('pointer-events', 'auto').removeClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-control-right').css('pointer-events', 'auto').removeClass('hidden_element');
+    $('#picture_player > .picplayer-content > .picplayer-canvas > .item > .caption').css('pointer-events', 'auto').removeClass('hidden_element');
     // 使用定时器，将左右按钮隐藏
     timer_ptr.stop();
     timer_ptr.play();
 }
 
 function showPictureWall(timeline_body) {
+  console.debug("showPictureWall()");
+
   // $('body').css('overflow', 'hidden');
   $("body > div[id='picture_player']").show();
   $("body > div[id!='picture_player']").hide();
@@ -351,11 +377,15 @@ function showPictureWall(timeline_body) {
 }
 
 function showPictureWallLeft(picplayer_control) {
+  console.debug("showPictureWallLeft()");
+
   var liid = $(picplayer_control).attr('data-liid');
   showPictureWallTimelineItem($('#' + liid));
 }
 
 function showPictureWallRight(picplayer_control) {
+  console.debug("showPictureWallRight()");
+
   var liid = $(picplayer_control).attr('data-liid');
   showPictureWallTimelineItem($('#' + liid));
 }
@@ -392,6 +422,8 @@ function showPictureWallTimelineItem(timeline_item) {
     picture_player.find('.picplayer-control-right').show();
   }
 }
+
+
 
 </script>
 

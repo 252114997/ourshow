@@ -32,4 +32,6 @@ Route::group(array('before' => 'auth'), function() {
 	Route::post('/switch-like/{ablum_id}/{likeit}', 'MainFrameController@switchLike');
 
 	Route::get('/get-picture/{picture_id}', 'MainFrameController@getPicture');
+	Route::get('/get-background/{filename}', 'MainFrameController@getBackground');
+
 });
