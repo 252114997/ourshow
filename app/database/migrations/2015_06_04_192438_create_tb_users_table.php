@@ -16,7 +16,7 @@ class CreateTbUsersTable extends Migration {
 		{
 			$table->integer('id', true);
 			$table->string('username')->nullable();
-			$table->string('token')->nullable();
+			$table->integer('licence_count')->default(0); // 许可次数，指定次数内，可以免输入 邀请码
 			$table->timestamps();
 		});
 	}

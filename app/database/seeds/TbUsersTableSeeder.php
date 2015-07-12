@@ -16,7 +16,7 @@ class TbUsersTableSeeder extends Seeder {
 			array (
 				'id' => 1,
 				'username' => '王一',
-				'token' => NULL,
+				'licence_count' => 0,
 				'created_at' => NULL,
 				'updated_at' => NULL,
 			),
@@ -24,7 +24,7 @@ class TbUsersTableSeeder extends Seeder {
 			array (
 				'id' => 2,
 				'username' => '王二',
-				'token' => NULL,
+				'licence_count' => 0,
 				'created_at' => NULL,
 				'updated_at' => NULL,
 			),
@@ -32,7 +32,7 @@ class TbUsersTableSeeder extends Seeder {
 			array (
 				'id' => 3,
 				'username' => '翟一',
-				'token' => NULL,
+				'licence_count' => 0,
 				'created_at' => NULL,
 				'updated_at' => NULL,
 			),
@@ -40,7 +40,7 @@ class TbUsersTableSeeder extends Seeder {
 			array (
 				'id' => 4,
 				'username' => '翟二',
-				'token' => NULL,
+				'licence_count' => 0,
 				'created_at' => NULL,
 				'updated_at' => NULL,
 			),

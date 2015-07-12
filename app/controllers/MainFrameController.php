@@ -23,7 +23,7 @@ class MainFrameController extends BaseController {
 		}
 
 		$param = array();
-	    $param['path'] = $item['path'];
+		$param['path'] = $item['path'];
 		$param['height'] = $max_length;
 		$param['width']  = $max_length;
 		Util::log_debug(json_encode($param));
@@ -56,12 +56,11 @@ class MainFrameController extends BaseController {
 		$time = $time_end - $time_start;
 		Util::log_debug("Get image in $time seconds.");
 
+		// 请求重复内容，使用304跳转，提高速度
 		$http_header = array(
 			"Last-Modified" => $content_datas['last_modified_time'],
 			"Etag" => $content_datas['etag'],
 		);
-		// var_dump(Request::header()); die;
-
 		Util::log_debug(" HTTP_IF_MODIFIED_SINCE = ".Request::header('If-Modified-Since'));
 		Util::log_debug(" HTTP_IF_NONE_MATCH = ".Request::header('If-None-Match'));
 		if (@strtotime(Request::header('If-Modified-Since')) == $content_datas['last_modified_time'] || 
@@ -72,7 +71,6 @@ class MainFrameController extends BaseController {
 		}
 
 		Util::log_debug(" http 200 ");
-
 		$http_header += array(
 			"Content-Type" => image_type_to_mime_type(exif_imagetype($param['path'])), //"image/x-png",
 			"Content-Length" => strlen($content_datas['content']),
@@ -82,58 +80,39 @@ class MainFrameController extends BaseController {
 
 	public function login()	{
 		if (UserAuthController::isLogin()) {
-			new ResizeImage(
-				('img/timeline/Penguins.jpg'),
-				400, 400,
-				0,
-				('img/timeline/100_100_Penguins.jpg'),
-				100
-			);
 			return Redirect::to('/welcome');
 		}
 
 		if (Request::isMethod('get')) {
 			$user_id = Input::get('id', null);
-			if (null != $user_id) {
-				$response = Response::make(View::make('login'));
-				$response->withCookie(Cookie::make('user_id', $user_id));
-				return $response;
+			$user_info = tb_users::where('id', $user_id)->first();
+			if (null == $user_info) {
+				return View::make('login')
+					->with('deny_info', '需要邀请码啊喂！请点击 短信/微信/QQ 中的链接地址访问！');
 			}
-			return View::make('login')
-				->with('deny_info', '需要邀请码啊喂！请点击 短信/微信/QQ 中的链接地址访问！');
+			// 使用免登录金牌
+			if (true !== UserAuthController::login($user_id, null)) {
+				return  Response::make(View::make('login'))
+					->withCookie(Cookie::make('user_id', $user_id));
+			}
+			return Redirect::to('/welcome');
 		}
 
-		if (!Request::isMethod('post')) {
-			return Response::make('此页面只能用GET/POST方法访问!', 404);
+		if (Request::isMethod('post')) {
+			// 使用邀请码登录
+			$token = Input::get('token');
+			$user_id = Cookie::get('user_id');
+
+			$error_info = UserAuthController::login($user_id, $token);
+			if (true !== $error_info) {
+				return Redirect::to('/login')
+					->with('error_info', $error_info)
+					->withInput();
+			}
+			return Redirect::to('/welcome');
 		}
 
-		$token = Input::get('token');
-		$user_id = Cookie::get('user_id');
-
-		$user_info = tb_users::where('id', $user_id)->first();
-		if (null == $user_info) {
-			return Redirect::to('/login')
-				->with('error_info', '未找到用户！请点击 短信/微信/QQ 中的链接地址访问')
-				->withInput();
-		}
-
-		$user_token_info = tb_user_token::select()
-			->where('user_id', $user_id)
-			->where('token', $token)
-			->first();
-		if (null == $user_token_info) {
-			return Redirect::to('/login')
-				->with('error_info', '邀请码不对啊喂，仔细核对一下短信')
-				->withInput();
-		}
-		tb_user_token::where('user_id', $user_id)
-			->where('token', $token)
-			->update(array('used' => 1));
-			
-		Session::put('user_token.user_id', $user_id);
-		Session::put('user_token.token', $token);
-
-		return Redirect::to('/welcome');
+		return Response::make('此页面只能用GET/POST方法访问!', 404);
 	}
 
 	public function welcome() {
