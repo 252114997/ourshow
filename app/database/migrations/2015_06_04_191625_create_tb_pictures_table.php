@@ -17,6 +17,7 @@ class CreateTbPicturesTable extends Migration {
 			$table->integer('id', true);
 			$table->string('name')->nullable();
 			$table->string('path')->nullable();
+			$table->string('caption')->nullable();
 			$table->timestamps();
 		});
 	}

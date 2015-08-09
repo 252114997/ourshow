@@ -24,6 +24,20 @@ class MainFrameController extends BaseController {
 
 
 	/**
+	 * @brief 返回指定相册的照片
+	 * @return json
+	 */
+	public function getPictures($ablum_id) {
+
+		$page = intval(Input::get('page', '1'));
+		$rows = intval(Input::get('rows', '6'));
+
+		$items = self::getPicturesOfAblum($ablum_id, $page, $rows);
+
+		return Response::json(array('status' => 1, 'msg' => 'success', 'data' => $items));
+	}
+
+	/**
 	 * @brief 返回照片，可指定参数进行缩放
 	 * @return image
 	 */
@@ -210,6 +224,26 @@ class MainFrameController extends BaseController {
 		return tb_like::where('ablum_id', $ablum_id)->where('user_id', $user_id)->count();
 	}
 
+	static public function getPicturesOfAblum($ablum_id, $page, $rows) {
+
+		$query_builder = tb_ablum_picture::select()->where('ablum_id', $ablum_id);
+		$total = $query_builder->count();
+		$offset = ($page - 1) * $rows;
+
+		$items = $query_builder
+			->orderBy('tb_ablum_picture.updated_at', 'desc')
+			->leftJoin('tb_pictures', 'tb_pictures.id', '=', 'tb_ablum_picture.picture_id')
+			->skip($offset)
+			->take($rows)
+			->get()
+			->toArray();
+			// ->lists('picture_id');
+		Util::log_debug("sql=".$query_builder->toSql());
+		Util::log_debug("pictures_of_ablum=".json_encode($items));
+
+		return array('rows' => $items, 'count' => $total);
+	}
+
 	static public function getCommentsOfAblum($ablum_id, $page, $rows) {
 
 		$query_builder = tb_posts::select()->where('ablum_id', $ablum_id);
@@ -232,7 +266,6 @@ class MainFrameController extends BaseController {
 		}
 
 		return array('rows' => $items, 'count' => $total);
-		// return $items;
 	}
 
 	// $param = array();
