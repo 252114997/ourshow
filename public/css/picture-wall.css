@@ -1,27 +1,6 @@
  /* GLOBAL STYLES
 -------------------------------------------------- */
 
-body {
-  background: #333; /*黑灰色的背景*/
-}
-
-/*去除滚动条*/
-body,
-div {
-  /*overflow: hidden;*/
-}
-
-.boxline {
-  /*border: solid  #6AC5AC 1px;*/
-}
-.boxline_red {
-  /*border: solid red 1px;*/
-}
-.boxline_blue {
-  /*border: solid  blue 1px;*/
-  /*background-color: blue;*/
-}
-
 .picplayer {
   width: 100%;
   height: 100%;

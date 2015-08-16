@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="{{ asset('css/timeline.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/comment.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/bounce.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/ouershow.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/picture-wall.css') }}">
 
 @stop
 
@@ -15,9 +15,9 @@
 
     <div class="site-background"></div>
 
-    <div class="cover-continer-my" >
+    <div class="cover-continer" >
 
-          <div class="cover-inner-my" onclick="shuffleBackground();" >
+          <div class="cover-inner" onclick="shuffleBackground();" >
             <h1 class="cover-heading">见证我们爱情</h1>
             <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
             <p class="lead">时间：2015-05-03 11:00</p>
@@ -416,8 +416,6 @@ function PictureWall() {
     false
   );
   this._timer_ptr = timer_ptr;
-
-  console.debug("in PictureWall.js ablum_id=" + this._ablum_id);
 }
 
 /**

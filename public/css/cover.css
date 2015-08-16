@@ -180,25 +180,25 @@ body {
  * @brief 实现居中效果
  */
 
-.cover-continer-my {
+.cover-continer {
   width: 100%;
   height: 100%; /* For at least Firefox */
 }
 
-.cover-inner-my:hover {
+.cover-inner:hover {
   cursor: pointer;
   background-color: rgba(0,0,0, 0.5);
 }
-.cover-inner-my:active {
+.cover-inner:active {
   background-color: rgba(0,0,0, 0.6);
   box-shadow: 2px 2px 9px rgba(0,0,0,0.7);
 }
-.cover-inner-my:hover > p,
-.cover-inner-my:hover > h1 {
+.cover-inner:hover > p,
+.cover-inner:hover > h1 {
   cursor: auto;
 }
 
-.cover-inner-my {
+.cover-inner {
     position: absolute;
     bottom: 50%;
     right: 50%;
@@ -220,14 +220,14 @@ body {
 
 /*如果目标是纵向模式智能手机，则使用：*/
 @media (max-width: 320px) { 
-    .cover-inner-my {
+    .cover-inner {
       min-width: 90%;
     }
 }
 
 /*如果目标是横向模式智能手机，则使用： */
 @media (min-width: 321px) { 
-    .cover-inner-my {
+    .cover-inner {
       min-width: 80%;
     }
 }
@@ -235,7 +235,7 @@ body {
 /*如果目标是纵向模式 iPad，则使用：*/ 
 /*@media (orientation: portrait) { */
 @media (min-width: 641px) and (max-width:770px){
-    .cover-inner-my {
+    .cover-inner {
       min-width: 75%;
     }
 }
@@ -243,14 +243,14 @@ body {
 /*如果目标是横向模式 Apple iPad，则使用： */
 /*@media (orientation: landscape) { */
 @media (min-width: 771px) and (max-width:1024px){
-    .cover-inner-my {
+    .cover-inner {
       min-width: 65%;
     }
 }
 
 /*如果目标是笔记本、台式机，则使用： */
 @media (min-width: 1025px){
-    .cover-inner-my {
+    .cover-inner {
       min-width: 50%;
     }
 }
