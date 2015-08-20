@@ -42,27 +42,35 @@
             @foreach ($param['ablums'] as $index => $ablum) 
               <li id="ablum_{{ $ablum['id'] }}" class="{{ ($index%2) ? 'timeline-inverted' : '' }}">
                 
-                <div class=" timeline-badge {{ $ablum['likeit'] ? 'heart-like' : 'heart-unlike' }}" 
+                <div class="timeline-badge {{ ($index%2) ? 'icon-footprint-left' : 'icon-footprint-right' }}" 
                     data-toggle="tooltip" data-placement="top" 
-                    title="{{ count($ablum['likes']) }} 人表示很赞"
-                    onclick='likeAblum(this, {{ $ablum["id"] }});' >
-                  <i class="glyphicon glyphicon-heart" ></i>
+                    title="{{ $ablum['tips'] }}" ><i class="glyphicon glyphicon-time" ></i>
                 </div>
 
-                <div class="timeline-panel">
-                  <div class="timeline-heading">
-                    <h4 class="timeline-title">{{ $ablum['title'] }}</h4>
-                  </div>
-
-                  <div class="timeline-body" onclick="showPictureWall({{ $ablum['id'] }});">
+                <div class="timeline-panel hide-caption">
+                  <div class="timeline-body" onclick="showPictureWall(this, {{ $ablum['id'] }}, event);">
                     <img src='{{ URL::to("/get-picture")."/".$ablum["picture_id"]["id"] }}' style="width:100%;" 
                       class="{{ rand(0,1) ? 'img-circle' : 'img-rounded' }}" />
-                    @if ($ablum['caption'])
+
+                    <div class="description">
+                      <h2 class="title">{{ $ablum['title'] }}</h2>
                       <p class="caption">{{ $ablum['caption'] }}</p>
-                    @endif
+                    </div>
+
+                    <div class="buttons">
+                      <a class="btn btn-xs {{ $ablum['likeit'] ? 'btn-danger' : 'btn-default' }}" 
+                          data-toggle="tooltip" data-placement="top" 
+                          title="{{ count($ablum['likes']) }} 人表示很赞"
+                          onclick='likeAblum(this, {{ $ablum["id"] }}); return false;' 
+                        ><i class="glyphicon glyphicon-thumbs-up" ></i> <span>赞({{ count($ablum['likes']) }})</span></a>
+                      <a class="btn btn-xs btn-default" 
+                          data-toggle="tooltip" data-placement="top" 
+                          onclick='toggleButtons(this); return false;' 
+                        ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
+                    </div>
                   </div>
 
-                  <div class="container usercomment">
+                  <div class="container usercomment" style="display:none">
                       <div class="text-center">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
@@ -142,6 +150,38 @@ $(function(){
 
   // 触屏界面中左右滑动时切换图片
   picture_wall.bindTouchEvent();
+
+  // 鼠标悬停在图片上，显示点赞按钮
+  var timeline_panels = $('.timeline-panel');
+  timeline_panels.each(function(index, entry){
+    $(entry)
+    .mouseenter(function() {
+      var current = $(this);
+      timeline_panels.each(function(index2, entry2){
+        entry2 = $(entry2);
+        if (entry2.is(current)) {
+          entry2.removeClass('hide-caption');
+        }
+        else {
+          entry2.addClass('hide-caption');
+        }
+      });
+      // console.debug('hide-caption   mouseenter');
+    })
+    .on('touchstart', function(){
+      var current = $(this);
+      timeline_panels.each(function(index2, entry2){
+        entry2 = $(entry2);
+        if (entry2.is(current)) {
+          entry2.removeClass('hide-caption');
+        }
+        else {
+          entry2.addClass('hide-caption');
+        }
+      });
+      // console.debug('hide-caption   touchstart');
+    });
+  });
 });
 
 
@@ -149,7 +189,7 @@ $(function(){
  * @brief 随机更换背景
  */
 function shuffleBackground() {
-  console.debug("shuffleBackground()");
+  // console.debug("shuffleBackground()");
 
   var random_backgrounds = {{ json_encode(array_values($param['random_backgrounds'])) }};
   var max_num = random_backgrounds.length;
@@ -169,16 +209,18 @@ function shuffleBackground() {
  */
 function doLikeit(button, likeit) {
   if (likeit) {
-    button.removeClass('heart-unlike').addClass('heart-like');
+    button.removeClass('btn-default').addClass('btn-danger');
   }
   else {
-    button.removeClass('heart-like').addClass('heart-unlike');
+    button.removeClass('btn-danger').addClass('btn-default');
   }
 }
 
 function likeAblum (button, ablum_id) {
+  console.debug('likeAblum');
+
   button = $(button);
-  var likeit = button.hasClass('heart-like');
+  var likeit = button.hasClass('btn-danger');
   doLikeit(button, !likeit);
   $.post(
     '{{ URL::to("/switch-like") }}' + '/' + ablum_id + '/' + (likeit ? '0' : '1'),   // URL
@@ -196,15 +238,28 @@ function likeAblum (button, ablum_id) {
         doLikeit(button, cur_likeit);
       }
       if (data.status) {
-        button.attr('data-original-title', Object.keys(data.data.likes).length + ' 人表示很赞');
+        var likeit_count = Object.keys(data.data.likes).length;
+        button.find('span').html('赞(' + likeit_count + ')');
+        button.attr('data-original-title', likeit_count + ' 人表示很赞');
         button.tooltip('show');
       }
     },     // callback
     "json" // data type
   );
-  return true;
+  return false;
 }
 
+function toggleButtons(button) {
+  console.debug('toggleButtons');
+
+  button = $(button);
+  var comment = button.closest('li').find('.usercomment');
+  var timeline_panel = button.closest('.timeline-panel');
+  comment.toggle();
+  button.toggleClass('active');
+  timeline_panel.toggleClass('black-background');
+  return false;
+}
 
 /**
  * @brief 实现评论功能
@@ -219,7 +274,7 @@ function addComment (button, ablum_id) {
     function(data) {
       if (1 != data.status) {
         // 失败
-        $().alert('close'); // test TODO
+        // $().alert('close'); // test TODO
         return;
       }
       $(button).prev('input').val('');
@@ -333,8 +388,18 @@ function hidePictureWall(event) {
   picture_wall.hide(event);
 }
 
-function showPictureWall(ablum_id) {
-  picture_wall.reloadPictureList(ablum_id);
+function showPictureWall(ui_control, ablum_id, event) {
+
+  if ($(event.target).prop("tagName").toLowerCase() != 'img') {
+    return;
+  }
+
+  ui_control = $(ui_control);
+
+  if (!ui_control.hasClass('hide-caption')) {
+    picture_wall.reloadPictureList(ablum_id);
+    return;
+  }
 }
 
 function showPictureWallNext() {
