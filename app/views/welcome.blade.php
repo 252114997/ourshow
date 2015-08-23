@@ -48,8 +48,8 @@
                 </div>
 
                 <div class="timeline-panel hide-caption">
-                  <div class="timeline-body" onclick="showPictureWall(this, {{ $ablum['id'] }}, event);">
-                    <img src='{{ URL::to("/get-picture")."/".$ablum["picture_id"]["id"] }}' style="width:100%;" 
+                  <div class="timeline-body">
+                    <img src='{{ URL::to("/get-picture")."/".$ablum["picture_id"]["id"] }}' 
                       class="{{ rand(0,1) ? 'img-circle' : 'img-rounded' }}" />
 
                     <div class="description">
@@ -58,6 +58,9 @@
                     </div>
 
                     <div class="buttons">
+                      <a class="btn btn-xs btn-default" 
+                          onclick="showPictureWall({{ $ablum['id'] }});"
+                        ><i class="glyphicon glyphicon-blackboard" ></i> 更多</a>
                       <a class="btn btn-xs {{ $ablum['likeit'] ? 'btn-danger' : 'btn-default' }}" 
                           data-toggle="tooltip" data-placement="top" 
                           title="{{ count($ablum['likes']) }} 人表示很赞"
@@ -155,31 +158,39 @@ $(function(){
   var timeline_panels = $('.timeline-panel');
   timeline_panels.each(function(index, entry){
     $(entry)
-    .mouseenter(function() {
-      var current = $(this);
-      timeline_panels.each(function(index2, entry2){
-        entry2 = $(entry2);
-        if (entry2.is(current)) {
-          entry2.removeClass('hide-caption');
-        }
-        else {
-          entry2.addClass('hide-caption');
-        }
+      .mouseenter(function() {
+        var current = $(this);
+        timeline_panels.each(function(index2, entry2){
+          entry2 = $(entry2);
+          if (entry2.is(current)) {
+            entry2.removeClass('hide-caption');
+          }
+          else {
+            entry2.addClass('hide-caption');
+          }
+        });
+        // console.debug('hide-caption   mouseenter');
+      })
+      .on('touchstart', function(){
+        var current = $(this);
+        timeline_panels.each(function(index2, entry2){
+          entry2 = $(entry2);
+          if (entry2.is(current)) {
+            entry2.removeClass('hide-caption');
+          }
+          else {
+            entry2.addClass('hide-caption');
+          }
+        });
+        // console.debug('hide-caption   touchstart');
       });
-      // console.debug('hide-caption   mouseenter');
-    })
-    .on('touchstart', function(){
-      var current = $(this);
-      timeline_panels.each(function(index2, entry2){
-        entry2 = $(entry2);
-        if (entry2.is(current)) {
-          entry2.removeClass('hide-caption');
-        }
-        else {
-          entry2.addClass('hide-caption');
-        }
-      });
-      // console.debug('hide-caption   touchstart');
+  });
+
+  // 相册图片出现时，渐显效果
+  $('.timeline-body img').appear();
+  $(document.body).on('appear', '.timeline-body img', function(event, $all_appeared_elements) {
+    $all_appeared_elements.each(function() {
+      $(this).css('opacity', 1);
     });
   });
 });
@@ -388,20 +399,9 @@ function hidePictureWall(event) {
   picture_wall.hide(event);
 }
 
-function showPictureWall(ui_control, ablum_id, event) {
-
-  if ($(event.target).prop("tagName").toLowerCase() != 'img') {
-    return;
-  }
-
-  ui_control = $(ui_control);
-
-  if (!ui_control.hasClass('hide-caption')) {
-    picture_wall.reloadPictureList(ablum_id);
-    return;
-  }
+function showPictureWall(ablum_id) {
+  picture_wall.reloadPictureList(ablum_id);
 }
-
 function showPictureWallNext() {
   picture_wall.next();
 }
@@ -919,4 +919,6 @@ PictureWall.prototype.showOrHidePlayerControl = function () {
 })(jQuery);
 
 </script>
+
+<script src="{{ asset('js/jquery.appear.js') }}"></script>
 @stop
