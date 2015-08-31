@@ -105,7 +105,7 @@
     <div id="picture_player" class="picplayer" style="display:none;">
         <div class="picplayer-content" onclick="showPicplayerControl(this); return false;">
             <div class="picplayer-canvas" >
-                <div class="item" onclick="hidePictureWall(event);">
+                <div class="item" >
                   <ul >
                     <li class="left_img" ><img /></li>
                     <li class="middle_img" ><img /></li>
@@ -125,6 +125,10 @@
             <a class="picplayer-control-next" onclick="showPictureWallNext();">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
+            </a>
+            <a class="picplayer-control-close" onclick="hidePictureWall(event);">
+                <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                <span class="sr-only">Close</span>
             </a>
 
         </div>
@@ -456,12 +460,14 @@ function PictureWall() {
   var parent_div = $('#picture_player');
   var player_control_last = parent_div.find('.picplayer-content > .picplayer-control-last');
   var player_control_next = parent_div.find('.picplayer-content > .picplayer-control-next');
+  var player_control_close = parent_div.find('.picplayer-content > .picplayer-control-close');
   var picture_list = parent_div.find('.picplayer-content > .picplayer-canvas > .item > ul');
   var picture_info = parent_div.find('.picplayer-content > .picplayer-canvas > .item > .info');
 
   this._element_parent_div = parent_div;
   this._element_player_control_last = player_control_last;
   this._element_player_control_next = player_control_next;
+  this._element_player_control_close = player_control_close;
   this._element_picture_list = picture_list;
   this._element_picture_info = picture_info;
 
@@ -474,7 +480,9 @@ function PictureWall() {
       console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
       player_control_last.addClass('hidden_element').css('pointer-events', 'none');
       player_control_next.addClass('hidden_element').css('pointer-events', 'none');
+      player_control_close.addClass('hidden_element').css('pointer-events', 'none');
       picture_info.addClass('hidden_element').css('pointer-events', 'none');
+      parent_div.css('opacity', '1');
       timer_ptr.stop();
     },
     5 * 1000,
@@ -645,15 +653,16 @@ PictureWall.prototype.hide = function (event) {
 
   if ( this._element_player_control_last.hasClass('hidden_element')
     || this._element_player_control_next.hasClass('hidden_element')
+    || this._element_player_control_close.hasClass('hidden_element')
     || this._element_picture_info.hasClass('hidden_element')
   ) {
     this.showPlayerControl();
     return false;
   }
 
-  if ($(event.target).prop("tagName").toLowerCase() != 'img') {
-    return;
-  }
+  // if ($(event.target).prop("tagName").toLowerCase() != 'img') {
+  //   return;
+  // }
 
   $("body > div[id!='picture_player']").show();
   $("body > div[id='picture_player']").hide();
@@ -798,9 +807,13 @@ PictureWall.prototype.showPlayerControl = function () {
   this._element_player_control_next
     .css('pointer-events', 'auto')
     .removeClass('hidden_element');
+  this._element_player_control_close
+    .css('pointer-events', 'auto')
+    .removeClass('hidden_element');
   this._element_picture_info
     .css('pointer-events', 'auto')
     .removeClass('hidden_element');
+  this._element_parent_div.css('opacity', '0.8');
 
   // 使用定时器，将左右按钮隐藏
   this._timer_ptr.stop();

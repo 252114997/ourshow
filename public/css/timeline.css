@@ -172,6 +172,10 @@
     color:#fff;
     text-align: left;
 
+    /* 防止描述信息遮挡按钮 */
+    max-height: 70%;  
+    overflow: hidden;
+
     /*background: rgba(0,0,0,0.5);*/
     /*灰色渐变背景*/
     background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .01) 100%);

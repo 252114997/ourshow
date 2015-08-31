@@ -26,8 +26,8 @@
   height: 100%;
 
   /*使箭头变成白色*/
-  font-size: 20px;
-  color: #fff;
+  font-size: 64px;
+  color: #bbb;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
   filter: alpha(opacity=50);
@@ -44,9 +44,9 @@
 
   /*灰色渐变背景*/
   background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
-  background-image: -o-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
+  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
   background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));
-  background-image: linear-gradient(to right, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
+  background-image:         linear-gradient(to right, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);
   background-repeat: repeat-x;
 
@@ -77,6 +77,36 @@
 }
 .picplayer-control-next .glyphicon {
   right: 20%;
+}
+
+.picplayer-control-close {
+  z-index: 100;
+  position: absolute;
+  bottom: 50%;
+  right: 50%;
+  
+  margin: 0;
+  padding: 0;
+
+  -moz-transform: translateX(50%) translateY(50%);
+  -webkit-transform: translateX(50%) translateY(50%);
+  -o-transform: translateX(50%) translateY(50%);
+  -ms-transform: translateX(50%) translateY(50%);
+  transform: translateX(50%) translateY(50%);
+
+  /*使箭头变成白色*/
+  font-size: 64px;
+  color: #bbb;
+
+  /*鼠标变成小手*/
+  cursor: pointer;
+
+}
+.picplayer-control-next:hover,
+.picplayer-control-last:hover,
+.picplayer-control-close:hover {
+  color: #fff;
+  text-shadow: 1px 1px 30px rgba(0,0,0,1);
 }
 
 
@@ -116,24 +146,26 @@
 }
 
 .left_img {
-
+  z-index: 1;
 }
 
 .middle_img {
-
+  z-index: 2;
 }
 
 .right_img {
-
+  z-index: 1;
 }
 
 .picplayer-canvas > div.item > ul > li > img {
-  max-width: 100%;
-  max-height: 100%;
-
   position: absolute;
+  min-height: 100%;
+  min-width: 100%;
   bottom: 50%;
   right: 50%;
+  
+  margin: 0;
+  padding: 0;
 
   -moz-transform: translateX(50%) translateY(50%);
   -webkit-transform: translateX(50%) translateY(50%);
@@ -143,7 +175,7 @@
 }
 
 .picplayer-canvas > div.item > .info {
-
+  z-index: 2;
   width: 100%;
   height: auto;
     
