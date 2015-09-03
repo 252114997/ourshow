@@ -13,7 +13,10 @@
 
 @section('body')
 
-    <div class="site-background"></div>
+    <div class="site-background site-background-front" 
+      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_backgrounds'][rand(0, count($param['random_backgrounds'])-1)] }})"></div>
+    <div class="site-background site-background-back"
+      style=""></div>
 
     <div class="cover-continer" >
 
@@ -145,7 +148,7 @@
 var picture_wall = new PictureWall();
 
 $(function(){
-  shuffleBackground();
+  initBackground();
 
   // 相册评论列表
   $('ul.ourshow-commmentlist').each(function(index, elem){
@@ -200,22 +203,102 @@ $(function(){
 });
 
 
+  var random_backgrounds_bak = {{ json_encode(array_values($param['random_backgrounds'])) }};
+  var random_backgrounds = $.extend(true, [], random_backgrounds_bak);
 /**
  * @brief 随机更换背景
  */
+function initBackground() {
+  var scale_now = 1;
+  $('div.site-background')
+    .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
+    .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
+    .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
+    .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
+    .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+    .css('text-indent', 1);
+}
 function shuffleBackground() {
   // console.debug("shuffleBackground()");
 
-  var random_backgrounds = {{ json_encode(array_values($param['random_backgrounds'])) }};
   var max_num = random_backgrounds.length;
   var shuffleNum = function() { 
     return Math.floor(Math.random()*max_num); // 0 - max_num 间的随机数
   };
   var index = shuffleNum();
-  $('div.site-background').css(
-    "background-image", 
-    'url( {{ URL::to("/get-background") }}/' + random_backgrounds[index] + '?width=' + $(window).width() + '&height=' + $(window).height() +' )'
-  );
+  var image_url = '{{ URL::to("/get-background") }}/' + random_backgrounds[index] + '?width=' + $(window).width() + '&height=' + $(window).height();
+
+  if (1 >= random_backgrounds.length) {
+    random_backgrounds = $.extend(true, [], random_backgrounds_bak);
+  }
+  else {
+    random_backgrounds.splice(index,1);
+  }
+
+  var background_front = $('div.site-background-front');
+  var background_back  = $('div.site-background-back');
+
+  // 在image下载完毕后再执行图片切换效果
+  $('<img/>').attr('src', image_url).on('load', function() {
+    // console.debug('image load completed.');
+    // console.debug('index=' + index);
+
+    $(this).remove(); // prevent memory leaks as @benweet suggested
+
+    background_front.stop();
+    background_back.stop();
+
+    background_back.css("background-image", 'url( ' + image_url  + ' )')
+    background_back.css({opacity: 0});
+
+    // 缩小当前图像
+    background_front.animate({textIndent: 1}, {
+      queue: false,
+      duration: 800, 
+      step: function(scale_now,fx) {
+        $(this)
+          .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+      },
+      complete: function() {
+        // console.debug('background_front zoom in completed.');
+        // console.debug('index=' + index);
+
+        // 淡出当前图像 淡入下一张图像
+        background_back.animate({opacity: 1}, {duration: 1000});
+        background_front.animate({opacity: 0}, {
+          duration: 1000, 
+          complete: function() {
+            // console.debug('background_front opacity 0 completed.');
+            // console.debug('index=' + index);
+
+            // 放大下一张图像
+            background_front.removeClass('site-background-front').addClass('site-background-back');
+            background_back.removeClass('site-background-back').addClass('site-background-front');
+            background_back.animate({textIndent: 1.1}, {
+              duration: 10000, 
+              step: function(scale_now, fx) {
+                $(this)
+                  .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
+                  .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
+                  .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
+                  .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
+                  .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+              },
+              complete: function() {
+                // console.debug('background_front switch to background_back completed.');
+                // console.debug('index=' + index);
+              }
+            });
+          }
+        });
+      }
+    });
+
+  });
 }
 
 

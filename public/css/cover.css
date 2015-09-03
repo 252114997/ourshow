@@ -195,7 +195,7 @@ body {
 }
 .cover-inner:hover > p,
 .cover-inner:hover > h1 {
-  cursor: auto;
+  cursor: pointer;
 }
 
 .cover-inner {
@@ -259,7 +259,6 @@ body {
  * @brief 展示背景图
  */
 .site-background {
-  z-index: -1;
   position: fixed;
   top: 0;
   left: 0;
@@ -270,9 +269,19 @@ body {
   height: 100%; /* For at least Firefox */
   min-height: 100%;
   -webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
+     -moz-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
+      -ms-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
+       -o-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
           box-shadow: inset 0 0 100px rgba(0,0,0,.7);
   ;
   background-color: #333; /* 黑灰色的背景 */
+
+}
+.site-background-front {
+  z-index: -1;
+}
+.site-background-back {
+  z-index: -2;
 }
 
 body {

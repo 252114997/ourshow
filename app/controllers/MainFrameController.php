@@ -119,7 +119,7 @@ class MainFrameController extends BaseController {
 
 		// 随机播放图片
 		$directory = 'img/background';
-		$scanned_directory = array_diff(scandir($directory), array('..', '.'));
+		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
 
 		return View::make('welcome')
 			->with(
