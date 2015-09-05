@@ -14,7 +14,7 @@
 @section('body')
 
     <div class="site-background site-background-front" 
-      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_backgrounds'][rand(0, count($param['random_backgrounds'])-1)] }})"></div>
+      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_backgrounds'][rand(0, count($param['random_backgrounds'])-1)] }}?width=800&height=800)"></div>
     <div class="site-background site-background-back"
       style=""></div>
 
@@ -105,7 +105,7 @@
     </div>
 
 
-    <div id="picture_player" class="picplayer" style="display:none;">
+    <div id="picture_player" class="picplayer plcplayer-animate-start">
         <div class="picplayer-content" onclick="showPicplayerControl(this); return false;">
             <div class="picplayer-canvas" >
                 <div class="item" >
@@ -202,9 +202,10 @@ $(function(){
   });
 });
 
+// 保证每次更换的背景不重复
+var random_backgrounds_bak = {{ json_encode(array_values($param['random_backgrounds'])) }};
+var random_backgrounds = $.extend(true, [], random_backgrounds_bak);
 
-  var random_backgrounds_bak = {{ json_encode(array_values($param['random_backgrounds'])) }};
-  var random_backgrounds = $.extend(true, [], random_backgrounds_bak);
 /**
  * @brief 随机更换背景
  */
@@ -217,6 +218,22 @@ function initBackground() {
     .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
     .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
     .css('text-indent', 1);
+
+  $.timer(function() {
+    var background_front = $('div.site-background-front');
+    background_front.animate({textIndent: 1.1}, {
+      duration: 10000, 
+      step: function(scale_now, fx) {
+        $(this)
+          .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
+          .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+      }
+    });
+  }).once(0);
+
 }
 function shuffleBackground() {
   // console.debug("shuffleBackground()");
@@ -268,9 +285,9 @@ function shuffleBackground() {
         // console.debug('index=' + index);
 
         // 淡出当前图像 淡入下一张图像
-        background_back.animate({opacity: 1}, {duration: 1000});
+        background_back.animate({opacity: 1}, {duration: 2000});
         background_front.animate({opacity: 0}, {
-          duration: 1000, 
+          duration: 2000, 
           complete: function() {
             // console.debug('background_front opacity 0 completed.');
             // console.debug('index=' + index);
@@ -483,11 +500,14 @@ function showPicplayerControl() {
 }
 
 function hidePictureWall(event) {
-  picture_wall.hide(event);
+
+  console.debug("hidePictureWall() target=" + ($(event.target).prop("tagName")));// $(event).target.get(0).tagName);
+
+  picture_wall.hide();
 }
 
 function showPictureWall(ablum_id) {
-  picture_wall.reloadPictureList(ablum_id);
+  picture_wall.show(ablum_id);
 }
 function showPictureWallNext() {
   picture_wall.next();
@@ -496,7 +516,6 @@ function showPictureWallNext() {
 function showPictureWallLast() {
   picture_wall.last();
 }
-
 
 
 /**
@@ -557,16 +576,12 @@ function PictureWall() {
   this._picture_array = [];
   this._picture_info_array = [];
   this._picture_index = 0;
+  var this_ptr = this;
 
   var timer_ptr = $.timer(
     function() {
       console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
-      player_control_last.addClass('hidden_element').css('pointer-events', 'none');
-      player_control_next.addClass('hidden_element').css('pointer-events', 'none');
-      player_control_close.addClass('hidden_element').css('pointer-events', 'none');
-      picture_info.addClass('hidden_element').css('pointer-events', 'none');
-      parent_div.css('opacity', '1');
-      timer_ptr.stop();
+      this_ptr.hidePlayerControl();
     },
     5 * 1000,
     false
@@ -648,13 +663,18 @@ PictureWall.prototype.bindTouchEvent = function() {
 
 }
 
-
 /**
  * @brief 更新照片列表
  */
-PictureWall.prototype.reloadPictureList = function (ablum_id) {
+PictureWall.prototype.show = function (ablum_id) {
   var this_ptr = this;
   this._ablum_id = ablum_id;
+
+  // 复原图片状态
+  this._element_picture_list.find('img').attr('src', 'img/ajax-loader.gif');
+
+  this.hidePlayerControl();
+  this._element_parent_div.addClass('plcplayer-animate-end');
 
   $.get(
     '{{ URL::to("/get-pictures") }}' + '/' + ablum_id,           // URL
@@ -662,11 +682,12 @@ PictureWall.prototype.reloadPictureList = function (ablum_id) {
     function(data) {
       if (data.status) {
         console.debug("get-pictures ok! ablum_id=" + ablum_id);
-       if (data.data.rows.length > 0) {
-          // $('body').css('overflow', 'hidden');
-          $("body > div[id='picture_player']").show();
-          $("body > div[id!='picture_player']").hide();
-          this_ptr.init(data.data.rows);
+        if (data.data.rows.length > 0) {
+          this_ptr.reloadPictureList(data.data.rows);
+        }
+        else {
+          this_ptr.hide();
+          this_ptr.hide(); // force hide()
         }
 
       }
@@ -681,8 +702,8 @@ PictureWall.prototype.reloadPictureList = function (ablum_id) {
 /**
  * @brief 初始化照片墙
  */
-PictureWall.prototype.init = function (picture_id_array) {
-  console.log("initPirtureWall() 1");
+PictureWall.prototype.reloadPictureList = function (picture_id_array) {
+  console.log("reloadPictureList() 1");
   this._picture_array = [];
   this._picture_info_array = [];
   this._picture_index = 0;
@@ -699,40 +720,53 @@ PictureWall.prototype.init = function (picture_id_array) {
   pic_list.empty();
 
   var src_param = '?width=' + $(window).width() + '&height=' + $(window).height();
-  var index = null;
-  if (null !== (index = this.getLastPictureIndex())) {
-    pic_list.append(
-      $('<li class="left_img"><img src="' +this._picture_array[index]+src_param+ '"></li>')
-        .css(left_img_pos(0))
-    );
+  var index_left = null;
+  var index_middle = null;
+  var index_right = null;
+  if (null !== (index_left = this.getLastPictureIndex())) {
+    var image_url1 = this._picture_array[index_left]+src_param;
+    console.debug('append index_left=' + index_left + ', url=' + image_url1);
+    var left_img = $('<li class="left_img"><img src="img/ajax-loader.gif"></li>')
+        .css(left_img_pos(0));
+    pic_list.append(left_img);
+    $('<img/>').attr('src', image_url1).on('load', function() {
+      left_img.find('img').attr('src', image_url1);
+    });
   }
-  if (null !== (index = this.getCurrentPictureIndex())) {
-    pic_list.append(
-      $('<li class="middle_img"><img src="' +this._picture_array[index]+src_param+ '"></li>')
-        .css(middle_img_pos(0))
-    );
+  if (null !== (index_middle = this.getCurrentPictureIndex())) {
     var pic_info = this._element_picture_info;
     pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
     pic_info.find('.caption').html(this._picture_info_array[this._picture_index].caption);
+
+    var image_url2 = this._picture_array[index_middle]+src_param;
+    console.debug('append index_middle=' + index_middle + ', url=' + image_url2);
+    var middle_img = $('<li class="middle_img"><img src="img/ajax-loader.gif"></li>')
+        .css(middle_img_pos(0));
+    pic_list.append(middle_img);
+    $('<img/>').attr('src', image_url2).on('load', function() {
+      middle_img.find('img').attr('src', image_url2);
+    });
+
   }
-  if (null !== (index = this.getNextPictureIndex())) {
-    pic_list.append(
-      $('<li class="right_img"><img src="' +this._picture_array[index]+src_param+ '"></li>')
-        .css(right_img_pos(0))
-    );
+  if (null !== (index_right = this.getNextPictureIndex())) {
+    var image_url3 = this._picture_array[index_right]+src_param;
+    console.debug('append index_right=' + index_right + ', url=' + image_url3);
+    var right_img = $('<li class="right_img"><img src="img/ajax-loader.gif"></li>')
+        .css(right_img_pos(0));
+    pic_list.append(right_img);
+    $('<img/>').attr('src', image_url3).on('load', function() {
+      right_img.find('img').attr('src', image_url3);
+    });
   }
 
   this.showOrHidePlayerControl();
-  this.showPlayerControl();
-  console.log("initPirtureWall() 3");
+  console.log("reloadPictureList() 3");
 }
 
 /**
  * @brief 隐藏照片墙
  */
-PictureWall.prototype.hide = function (event) {
-
-  console.debug("hidePictureWall() target=" + ($(event.target).prop("tagName")));// $(event).target.get(0).tagName);
+PictureWall.prototype.hide = function () {
 
   if ( this._element_player_control_last.hasClass('hidden_element')
     || this._element_player_control_next.hasClass('hidden_element')
@@ -743,14 +777,8 @@ PictureWall.prototype.hide = function (event) {
     return false;
   }
 
-  // if ($(event.target).prop("tagName").toLowerCase() != 'img') {
-  //   return;
-  // }
+  this._element_parent_div.removeClass('plcplayer-animate-end');
 
-  $("body > div[id!='picture_player']").show();
-  $("body > div[id='picture_player']").hide();
-
-  location.href = '#ablum_' + this._ablum_id ;
 }
 
 
@@ -803,8 +831,13 @@ PictureWall.prototype.next = function () {
   var src_param = '?width=' + $(window).width() + '&height=' + $(window).height();
   if (!right_img.length) {
     // 如果没找到 right_img 标签
-    right_img = $("<li class='right_img' ><img src='"+this._picture_array[ right_index ]+src_param+"' ></li>")
+    var image_url = this._picture_array[right_index]+src_param;
+    right_img = $("<li class='right_img' ><img src='img/ajax-loader.gif' ></li>")
     middle_img.after(right_img.css($.extend(right_img_pos(0),img_no_animations)));
+    
+    $('<img/>').attr('src', image_url).on('load', function() {
+      right_img.find('img').attr('src', image_url);
+    });
   }
 
   // < < < 向左移动
@@ -814,8 +847,12 @@ PictureWall.prototype.next = function () {
   right_img.removeClass('right_img').css($.extend(middle_img_pos(0),img_animations))
     .addClass('middle_img');
   if (null !== (right_index = this.getNextPictureIndex())) {
-    var new_right_img = $("<li class='right_img' ><img src='"+this._picture_array[ right_index ]+src_param+"' ></li>")
+    var image_url = this._picture_array[right_index]+src_param;
+    var new_right_img = $("<li class='right_img' ><img src='img/ajax-loader.gif' ></li>")
     right_img.after(new_right_img.css($.extend(right_img_pos(0),img_no_animations)));
+    $('<img/>').attr('src', image_url).on('load', function() {
+      new_right_img.find('img').attr('src', image_url);
+    });
   }
 
   pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
@@ -841,14 +878,22 @@ PictureWall.prototype.last = function () {
   var src_param = '?width=' + $(window).width() + '&height=' + $(window).height();
   if (!left_img.length) {
     // 如果没找到 left_img 标签
-    left_img = $("<li class='left_img' ><img src='"+this._picture_array[ left_index ]+src_param+"' ></li>")
+    var image_url = this._picture_array[left_index]+src_param;
+    left_img = $("<li class='left_img' ><img src='img/ajax-loader.gif' ></li>")
     middle_img.before(left_img.css($.extend(left_img_pos(0),img_no_animations)));
+    $('<img/>').attr('src', image_url).on('load', function() {
+      left_img.find('img').attr('src', image_url);
+    });
   }
 
   // > > > 向右移动
   if (null !== (left_index = this.getLastPictureIndex())) {
-    var new_left_img = $("<li class='left_img' ><img src='"+this._picture_array[ left_index ]+src_param+"' ></li>")
+    var image_url = this._picture_array[left_index]+src_param;
+    var new_left_img = $("<li class='left_img' ><img src='img/ajax-loader.gif' ></li>")
     left_img.before(new_left_img.css($.extend(left_img_pos(0),img_no_animations)));
+    $('<img/>').attr('src', image_url).on('load', function() {
+      new_left_img.find('img').attr('src', image_url);
+    });
   }
   left_img.removeClass('left_img').css($.extend(middle_img_pos(0),img_animations))
     .addClass('middle_img');
@@ -896,12 +941,23 @@ PictureWall.prototype.showPlayerControl = function () {
   this._element_picture_info
     .css('pointer-events', 'auto')
     .removeClass('hidden_element');
-  this._element_parent_div.css('opacity', '0.8');
+  this._element_picture_list.css('opacity', '0.8');
 
   // 使用定时器，将左右按钮隐藏
   this._timer_ptr.stop();
   this._timer_ptr.play();
 }
+PictureWall.prototype.hidePlayerControl = function () {
+  console.debug("hidePlayerControl()");
+
+  this._element_player_control_last.addClass('hidden_element').css('pointer-events', 'none');
+  this._element_player_control_next.addClass('hidden_element').css('pointer-events', 'none');
+  this._element_player_control_close.addClass('hidden_element').css('pointer-events', 'none');
+  this._element_picture_info.addClass('hidden_element').css('pointer-events', 'none');
+  this._element_picture_list.css('opacity', '1');
+  this._timer_ptr.stop();
+}
+
 PictureWall.prototype.showOrHidePlayerControl = function () {
   // 如果没有 前/后一张 则隐藏相关按钮
   if (null == this.getLastPictureIndex()) {
