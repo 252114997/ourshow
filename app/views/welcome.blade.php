@@ -510,11 +510,11 @@ function showPictureWall(ablum_id) {
   picture_wall.show(ablum_id);
 }
 function showPictureWallNext() {
-  picture_wall.next();
+  picture_wall.next(250);
 }
 
 function showPictureWallLast() {
-  picture_wall.last();
+  picture_wall.last(250);
 }
 
 
@@ -545,14 +545,25 @@ function middle_img_pos(offset) {
 function right_img_pos(offset) {
   return img_transform( +$(window).width() + parseInt(offset) );
 };
-var img_animations = {
-  'transition': 'transform 150ms ease 0s'
+
+/**
+ * @brief 常用 CSS ，写成 js 变量，方便复用
+ */
+function img_animations(time) {
+  var css = {
+  '-webkit-transition': 'all '+ time +'ms ease-out 0s',
+     '-moz-transition': 'all '+ time +'ms ease-out 0s',
+      '-ms-transition': 'all '+ time +'ms ease-out 0s',
+       '-o-transition': 'all '+ time +'ms ease-out 0s',
+          'transition': 'all '+ time +'ms ease-out 0s'
+  };
+  return css;
 };
-var img_animations_fast = {
-  'transition': 'transform 150ms ease 0s'
+function img_animations_fast() {
+  return img_animations(250);
 };
-var img_no_animations = {
-  'transition': 'transform 0s ease 0s'
+function img_no_animations() {
+  return img_animations(0);
 };
 
 /**
@@ -600,12 +611,14 @@ PictureWall.prototype.bindTouchEvent = function() {
     var left_img = pic_list.find('li.left_img');
     var middle_img = pic_list.find('li.middle_img');
     var right_img = pic_list.find('li.right_img');
+    // var start_time = null;
 
     if (phase == 'start'){ // on touchstart
       console.log("start");
-      left_img.css(img_no_animations);
-      middle_img.css(img_no_animations);
-      right_img.css(img_no_animations);
+      left_img.css(img_no_animations());
+      middle_img.css(img_no_animations());
+      right_img.css(img_no_animations());
+      this._start_time = new Date();
     }
     else if (phase == 'move') {
       console.log("move");
@@ -618,21 +631,24 @@ PictureWall.prototype.bindTouchEvent = function() {
       }
     }
     else if (phase == 'end'){ // on touchend
-      console.log("end");
-      left_img.css(img_animations);
-      middle_img.css(img_animations);
-      right_img.css(img_animations);
+
+      var end_time = new Date();
+      var time = end_time.getTime()- this._start_time.getTime(); // ms
+      var d = ($(window).width()- Math.abs(distance));
+      var t = d * time / Math.abs(distance);
+      t = t * 0.7;
+      console.log("end  t=" + t);
 
       // TODO 根据手指滑动速度改变照片切换速度，提高“跟手”感觉
       // TODO 多于1个手指在屏幕上滑动时，不执行照片切换操作
       if (swipetype == 'left' || swipetype == 'right'){ // if a successful left or right swipe is made
         if (dir == 'left') {
           console.log('swipeleft ');
-          this_ptr.next();
+          this_ptr.next(t);
         }
         else if (dir == 'right') {
           console.log('swiperight ');
-          this_ptr.last();
+          this_ptr.last(t);
         }
       }
       else if (dir == 'left' || dir == 'right'){
@@ -642,21 +658,21 @@ PictureWall.prototype.bindTouchEvent = function() {
         if (Math.abs(distance) > max_width) {
           if (dir == 'left') {
             console.log('swipeleft because move over 50%, distance=' + distance);
-            this_ptr.next();
+            this_ptr.next(t);
           }
           else if (dir == 'right') {
             console.log('swiperight because move over 50%, distance=' + distance);
-            this_ptr.last();
+            this_ptr.last(t);
           }
         }
         else {
           console.info("showPictureWallReset() 1 ...");
-          this_ptr.reset();
+          this_ptr.reset(t);
         }
       }
       else {
         console.info("showPictureWallReset() 2 ...");
-        this_ptr.reset();
+        this_ptr.reset(t);
       }
     }
   }); // end ontouch
@@ -813,11 +829,11 @@ PictureWall.prototype.getLastPictureIndex = function () {
 /**
  * @brief 执行切换照片的操作
  */
-PictureWall.prototype.next = function () {
+PictureWall.prototype.next = function (time) {
   console.debug("next()");
   var right_index = null;
   if (null === (right_index = this.getNextPictureIndex())) {
-    this.reset();
+    this.reset(time);
     return;
   }
   this._picture_index = right_index;
@@ -833,7 +849,7 @@ PictureWall.prototype.next = function () {
     // 如果没找到 right_img 标签
     var image_url = this._picture_array[right_index]+src_param;
     right_img = $("<li class='right_img' ><img src='img/ajax-loader.gif' ></li>")
-    middle_img.after(right_img.css($.extend(right_img_pos(0),img_no_animations)));
+    middle_img.after(right_img.css($.extend(right_img_pos(0),img_no_animations())));
     
     $('<img/>').attr('src', image_url).on('load', function() {
       right_img.find('img').attr('src', image_url);
@@ -842,14 +858,14 @@ PictureWall.prototype.next = function () {
 
   // < < < 向左移动
   left_img.remove();
-  middle_img.removeClass('middle_img').css($.extend(left_img_pos(0),img_animations))
+  middle_img.removeClass('middle_img').css($.extend(left_img_pos(0),img_animations(time)))
     .addClass('left_img');
-  right_img.removeClass('right_img').css($.extend(middle_img_pos(0),img_animations))
+  right_img.removeClass('right_img').css($.extend(middle_img_pos(0),img_animations(time)))
     .addClass('middle_img');
   if (null !== (right_index = this.getNextPictureIndex())) {
     var image_url = this._picture_array[right_index]+src_param;
     var new_right_img = $("<li class='right_img' ><img src='img/ajax-loader.gif' ></li>")
-    right_img.after(new_right_img.css($.extend(right_img_pos(0),img_no_animations)));
+    right_img.after(new_right_img.css($.extend(right_img_pos(0),img_no_animations())));
     $('<img/>').attr('src', image_url).on('load', function() {
       new_right_img.find('img').attr('src', image_url);
     });
@@ -861,11 +877,11 @@ PictureWall.prototype.next = function () {
   this.showOrHidePlayerControl();
 }
 
-PictureWall.prototype.last = function () {
+PictureWall.prototype.last = function (time) {
   console.debug("last()");  
   var left_index = null;
   if (null === (left_index = this.getLastPictureIndex())) {
-    this.reset();
+    this.reset(time);
     return;
   }
   this._picture_index = left_index;
@@ -880,7 +896,7 @@ PictureWall.prototype.last = function () {
     // 如果没找到 left_img 标签
     var image_url = this._picture_array[left_index]+src_param;
     left_img = $("<li class='left_img' ><img src='img/ajax-loader.gif' ></li>")
-    middle_img.before(left_img.css($.extend(left_img_pos(0),img_no_animations)));
+    middle_img.before(left_img.css($.extend(left_img_pos(0),img_no_animations())));
     $('<img/>').attr('src', image_url).on('load', function() {
       left_img.find('img').attr('src', image_url);
     });
@@ -890,14 +906,14 @@ PictureWall.prototype.last = function () {
   if (null !== (left_index = this.getLastPictureIndex())) {
     var image_url = this._picture_array[left_index]+src_param;
     var new_left_img = $("<li class='left_img' ><img src='img/ajax-loader.gif' ></li>")
-    left_img.before(new_left_img.css($.extend(left_img_pos(0),img_no_animations)));
+    left_img.before(new_left_img.css($.extend(left_img_pos(0),img_no_animations())));
     $('<img/>').attr('src', image_url).on('load', function() {
       new_left_img.find('img').attr('src', image_url);
     });
   }
-  left_img.removeClass('left_img').css($.extend(middle_img_pos(0),img_animations))
+  left_img.removeClass('left_img').css($.extend(middle_img_pos(0),img_animations(time)))
     .addClass('middle_img');
-  middle_img.removeClass('middle_img').css($.extend(right_img_pos(0),img_animations))
+  middle_img.removeClass('middle_img').css($.extend(right_img_pos(0),img_animations(time)))
     .addClass('right_img');
   right_img.remove();
 
@@ -907,7 +923,7 @@ PictureWall.prototype.last = function () {
   this.showOrHidePlayerControl();
 }
 
-PictureWall.prototype.reset = function () {
+PictureWall.prototype.reset = function (time) {
   console.debug("reset()");
   var pic_list = this._element_picture_list;
   var left_img = pic_list.find('li.left_img');
@@ -918,9 +934,11 @@ PictureWall.prototype.reset = function () {
   
   // 图像归位
   var offset = 0;
-  left_img.css(left_img_pos(offset));
-  middle_img.css(middle_img_pos(offset));
-  right_img.css(right_img_pos(offset));
+
+  left_img.css($.extend(left_img_pos(offset),img_animations(time)));
+  middle_img.css($.extend(middle_img_pos(offset),img_animations(time)));
+  right_img.css($.extend(right_img_pos(offset),img_animations(time)));
+
 }
 
 /**
