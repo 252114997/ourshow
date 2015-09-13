@@ -106,7 +106,7 @@
 
 
     <div id="picture_player" class="picplayer plcplayer-animate-start">
-        <div class="picplayer-content" onclick="showPicplayerControl(this); return false;">
+        <div class="picplayer-content" onclick="showOrHidePlayerControl(this);">
             <div class="picplayer-canvas" >
                 <div class="item" >
                   <ul >
@@ -120,12 +120,12 @@
                   </div>
                 </div>
             </div>
-            <a class="picplayer-control-last" onclick="showPictureWallLast();">
+            <a class="picplayer-control-last" onclick="showPictureWallLast(event);">
                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                 <span class="sr-only">Previous</span>
             </a>
             
-            <a class="picplayer-control-next" onclick="showPictureWallNext();">
+            <a class="picplayer-control-next" onclick="showPictureWallNext(event);">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
@@ -495,26 +495,40 @@ function reloadComment(commmentlist) {
 /**
  * @brief 照片墙功能的事件响应函数
  */
-function showPicplayerControl() {
-  picture_wall.showPlayerControl();
+function showOrHidePlayerControl() {
+  console.debug('showOrHidePlayerControl');
+  if ( picture_wall.isShowPlayerControl()) {
+    picture_wall.hidePlayerControl();
+  }
+  else {
+    picture_wall.showPlayerControl();
+  }
 }
 
 function hidePictureWall(event) {
-
-  console.debug("hidePictureWall() target=" + ($(event.target).prop("tagName")));// $(event).target.get(0).tagName);
-
   picture_wall.hide();
 }
 
 function showPictureWall(ablum_id) {
   picture_wall.show(ablum_id);
 }
-function showPictureWallNext() {
-  picture_wall.next(250);
-}
 
-function showPictureWallLast() {
-  picture_wall.last(250);
+function showPictureWallNext(e) {
+  console.debug('showPictureWallNext');
+  picture_wall.next(1);
+  picture_wall.showPlayerControl();
+
+  e.stopPropagation();
+  e.preventDefault();
+}
+function showPictureWallLast(e) {
+  console.debug('showPictureWallLast');
+  picture_wall.last(1);
+  picture_wall.showPlayerControl();
+
+  e.stopPropagation();
+  e.preventDefault();
+
 }
 
 
@@ -551,16 +565,13 @@ function right_img_pos(offset) {
  */
 function img_animations(time) {
   var css = {
-  '-webkit-transition': 'all '+ time +'ms ease-out 0s',
-     '-moz-transition': 'all '+ time +'ms ease-out 0s',
-      '-ms-transition': 'all '+ time +'ms ease-out 0s',
-       '-o-transition': 'all '+ time +'ms ease-out 0s',
-          'transition': 'all '+ time +'ms ease-out 0s'
+          'transition': 'transform '+ time +'ms ease-out 0s',
+       '-o-transition': 'transform '+ time +'ms ease-out 0s',
+      '-ms-transition': 'transform '+ time +'ms ease-out 0s',
+     '-moz-transition': 'transform '+ time +'ms ease-out 0s',
+  '-webkit-transition': '-webkit-transform '+ time +'ms ease-out 0s'
   };
   return css;
-};
-function img_animations_fast() {
-  return img_animations(250);
 };
 function img_no_animations() {
   return img_animations(0);
@@ -600,6 +611,16 @@ function PictureWall() {
   this._timer_ptr = timer_ptr;
 }
 
+function getTranslateX(element) {
+  if (element.size() == 0) {
+    return 0;
+  }
+  // http://stackoverflow.com/questions/5968227/get-the-value-of-webkit-transform-of-an-element-with-jquery
+  var style = window.getComputedStyle(element.get(0));  // Need the DOM object
+  var matrix = new WebKitCSSMatrix(style.webkitTransform);
+  return parseInt(matrix.m41);
+}
+
 /**
  * @brief 绑定 touch* 事件，仅执行一次即可
  */
@@ -608,71 +629,86 @@ PictureWall.prototype.bindTouchEvent = function() {
   var pic_list = this._element_picture_list;
 
   $.ontouchevent(this._element_parent_div, function(evt, dir, phase, swipetype, distance){
+    var tag_name = ($(evt.target).prop("tagName")).toLowerCase();
+    if (tag_name !== 'li' && tag_name !== 'img' ) {
+      return;
+    }
+
     var left_img = pic_list.find('li.left_img');
     var middle_img = pic_list.find('li.middle_img');
     var right_img = pic_list.find('li.right_img');
-    // var start_time = null;
 
     if (phase == 'start'){ // on touchstart
-      console.log("start");
       left_img.css(img_no_animations());
       middle_img.css(img_no_animations());
       right_img.css(img_no_animations());
       this._start_time = new Date();
+
+      this._left_x = getTranslateX(left_img);
+      this._middle_x = getTranslateX(middle_img);
+      this._right_x = getTranslateX(right_img);
+      // console.log('_left_x=' + this._left_x); 
+      // console.log('_middle_x=' + this._middle_x); 
+      // console.log('_right_x=' + this._right_x); 
     }
     else if (phase == 'move') {
       console.log("move");
       if ((dir =='left') || (dir =='right')){ //  on touchmove and if moving left or right
-        var offset = distance;
+        // console.debug('distance offset = ' + distance);
         // < < < 左右 > > > 移动
-        left_img.css(left_img_pos(offset));
-        middle_img.css(middle_img_pos(offset));
-        right_img.css(right_img_pos(offset));
+
+        // 以元素的 TranslateX 为起点，
+        // 屏幕滑动的距离为 offset (distance) 
+        // 设置新的 TranslateX， 使得可以连续滑动切换图片
+        left_img.css(middle_img_pos(distance + this._left_x));
+        middle_img.css(middle_img_pos(distance + this._middle_x));
+        right_img.css(middle_img_pos(distance + this._right_x));
       }
     }
     else if (phase == 'end'){ // on touchend
-
+      
+      // 根据手指滑动速度改变照片切换速度，提高“跟手”感觉
       var end_time = new Date();
       var time = end_time.getTime()- this._start_time.getTime(); // ms
-      var d = ($(window).width()- Math.abs(distance));
-      var t = d * time / Math.abs(distance);
-      t = t * 0.7;
-      console.log("end  t=" + t);
+      var rate = 0;
+      rate = time / Math.abs(distance); // 这里算的其实不是速度，只是时间与距离的比率
+      rate = (rate>4) ? 4 : (rate*0.8); // *0.8 可加快移动速度
 
-      // TODO 根据手指滑动速度改变照片切换速度，提高“跟手”感觉
+      // console.log("end distance=" + distance);
+      // console.log("end time=" + time + ',rate =' + rate);
+
       // TODO 多于1个手指在屏幕上滑动时，不执行照片切换操作
       if (swipetype == 'left' || swipetype == 'right'){ // if a successful left or right swipe is made
         if (dir == 'left') {
-          console.log('swipeleft ');
-          this_ptr.next(t);
+          // console.log('swipeleft ');
+          this_ptr.next(rate);
         }
         else if (dir == 'right') {
-          console.log('swiperight ');
-          this_ptr.last(t);
+          // console.log('swiperight ');
+          this_ptr.last(rate);
         }
       }
       else if (dir == 'left' || dir == 'right'){
-        var max_width = $(window).width() * 0.4; // 移动距离超过40%，即执行照片切换操作
-        console.log("distance = " + distance);
-        console.log("50% window width = " + max_width);
+        var max_width = $(window).width() * 0.6; // 移动距离超过60%，即执行照片切换操作
+        // console.log("50% window width = " + max_width);
         if (Math.abs(distance) > max_width) {
           if (dir == 'left') {
-            console.log('swipeleft because move over 50%, distance=' + distance);
-            this_ptr.next(t);
+            // console.log('swipeleft because move over 50%, distance=' + distance);
+            this_ptr.next(rate);
           }
           else if (dir == 'right') {
-            console.log('swiperight because move over 50%, distance=' + distance);
-            this_ptr.last(t);
+            // console.log('swiperight because move over 50%, distance=' + distance);
+            this_ptr.last(rate);
           }
         }
         else {
           console.info("showPictureWallReset() 1 ...");
-          this_ptr.reset(t);
+          this_ptr.reset(rate);
         }
       }
       else {
         console.info("showPictureWallReset() 2 ...");
-        this_ptr.reset(t);
+        this_ptr.reset(rate);
       }
     }
   }); // end ontouch
@@ -775,7 +811,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array) {
     });
   }
 
-  this.showOrHidePlayerControl();
+  this.showOrHideLastNextButton();
   console.log("reloadPictureList() 3");
 }
 
@@ -783,18 +819,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array) {
  * @brief 隐藏照片墙
  */
 PictureWall.prototype.hide = function () {
-
-  if ( this._element_player_control_last.hasClass('hidden_element')
-    || this._element_player_control_next.hasClass('hidden_element')
-    || this._element_player_control_close.hasClass('hidden_element')
-    || this._element_picture_info.hasClass('hidden_element')
-  ) {
-    this.showPlayerControl();
-    return false;
-  }
-
   this._element_parent_div.removeClass('plcplayer-animate-end');
-
 }
 
 
@@ -829,11 +854,11 @@ PictureWall.prototype.getLastPictureIndex = function () {
 /**
  * @brief 执行切换照片的操作
  */
-PictureWall.prototype.next = function (time) {
+PictureWall.prototype.next = function (rate) {
   console.debug("next()");
   var right_index = null;
   if (null === (right_index = this.getNextPictureIndex())) {
-    this.reset(time);
+    this.reset(rate);
     return;
   }
   this._picture_index = right_index;
@@ -844,13 +869,21 @@ PictureWall.prototype.next = function (time) {
   var middle_img = pic_list.find('li.middle_img');
   var right_img = pic_list.find('li.right_img');
 
+  // 下一个 middle 的 translateX 的值即为本次动画中需要移动的距离
+  // 所以根据 距离(distance) 及 滑动屏幕的速率(rate) ，就能计算出本次动画的时间
+  var distance = getTranslateX(right_img);
+  var time = rate * Math.abs(distance);
+  left_img.css(img_animations(time));
+  middle_img.css(img_animations(time));
+  right_img.css(img_animations(time));
+
   var src_param = '?width=' + $(window).width() + '&height=' + $(window).height();
   if (!right_img.length) {
     // 如果没找到 right_img 标签
     var image_url = this._picture_array[right_index]+src_param;
     right_img = $("<li class='right_img' ><img src='img/ajax-loader.gif' ></li>")
     middle_img.after(right_img.css($.extend(right_img_pos(0),img_no_animations())));
-    
+
     $('<img/>').attr('src', image_url).on('load', function() {
       right_img.find('img').attr('src', image_url);
     });
@@ -862,6 +895,7 @@ PictureWall.prototype.next = function (time) {
     .addClass('left_img');
   right_img.removeClass('right_img').css($.extend(middle_img_pos(0),img_animations(time)))
     .addClass('middle_img');
+
   if (null !== (right_index = this.getNextPictureIndex())) {
     var image_url = this._picture_array[right_index]+src_param;
     var new_right_img = $("<li class='right_img' ><img src='img/ajax-loader.gif' ></li>")
@@ -874,14 +908,14 @@ PictureWall.prototype.next = function (time) {
   pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
   pic_info.find('.caption').html(this._picture_info_array[this._picture_index].caption);
 
-  this.showOrHidePlayerControl();
+  this.showOrHideLastNextButton();
 }
 
-PictureWall.prototype.last = function (time) {
+PictureWall.prototype.last = function (rate) {
   console.debug("last()");  
   var left_index = null;
   if (null === (left_index = this.getLastPictureIndex())) {
-    this.reset(time);
+    this.reset(rate);
     return;
   }
   this._picture_index = left_index;
@@ -891,6 +925,13 @@ PictureWall.prototype.last = function (time) {
   var left_img = pic_list.find('li.left_img');
   var middle_img = pic_list.find('li.middle_img');
   var right_img = pic_list.find('li.right_img');
+
+  var distance = getTranslateX(left_img);
+  var time = rate * Math.abs(distance);
+  left_img.css(img_animations(time));
+  middle_img.css(img_animations(time));
+  right_img.css(img_animations(time));
+
   var src_param = '?width=' + $(window).width() + '&height=' + $(window).height();
   if (!left_img.length) {
     // 如果没找到 left_img 标签
@@ -920,25 +961,41 @@ PictureWall.prototype.last = function (time) {
   pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
   pic_info.find('.caption').html(this._picture_info_array[this._picture_index].caption);
 
-  this.showOrHidePlayerControl();
+  this.showOrHideLastNextButton();
 }
 
-PictureWall.prototype.reset = function (time) {
+PictureWall.prototype.reset = function (rate) {
   console.debug("reset()");
   var pic_list = this._element_picture_list;
   var left_img = pic_list.find('li.left_img');
   var middle_img = pic_list.find('li.middle_img');
   var right_img = pic_list.find('li.right_img');
-
-  this.showOrHidePlayerControl();
   
+  var distance = getTranslateX(middle_img);
+  var time = rate * Math.abs(distance);
+
+  // 提前设置一遍 transition ，才能在 windows phone 中的IE 看到动画效果
+  left_img.css(img_animations(time));
+  middle_img.css(img_animations(time));
+  right_img.css(img_animations(time));
+
   // 图像归位
   var offset = 0;
-
   left_img.css($.extend(left_img_pos(offset),img_animations(time)));
   middle_img.css($.extend(middle_img_pos(offset),img_animations(time)));
   right_img.css($.extend(right_img_pos(offset),img_animations(time)));
 
+}
+
+PictureWall.prototype.isShowPlayerControl = function () {
+  if ( this._element_player_control_last.hasClass('hidden_element')
+    || this._element_player_control_next.hasClass('hidden_element')
+    || this._element_player_control_close.hasClass('hidden_element')
+    || this._element_picture_info.hasClass('hidden_element')
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -976,7 +1033,7 @@ PictureWall.prototype.hidePlayerControl = function () {
   this._timer_ptr.stop();
 }
 
-PictureWall.prototype.showOrHidePlayerControl = function () {
+PictureWall.prototype.showOrHideLastNextButton = function () {
   // 如果没有 前/后一张 则隐藏相关按钮
   if (null == this.getLastPictureIndex()) {
     this._element_player_control_last.hide();
@@ -1035,14 +1092,19 @@ PictureWall.prototype.showOrHidePlayerControl = function () {
         var touchobj = e.changedTouches[0];
         distX = touchobj.pageX - startX; // get horizontal dist traveled by finger while in contact with surface
         distY = touchobj.pageY - startY; // get vertical dist traveled by finger while in contact with surface
-        if (Math.abs(distX) > Math.abs(distY)){ // if distance traveled horizontally is greater than vertically, consider this a horizontal movement
-            dir = (distX < 0)? 'left' : 'right';
-            handletouch(e, dir, 'move', swipeType, distX); // fire callback function with params dir="left|right", phase="move", swipetype="none" etc
-        }
-        else{ // else consider this a vertical movement
-            dir = (distY < 0)? 'up' : 'down';
-            handletouch(e, dir, 'move', swipeType, distY); // fire callback function with params dir="up|down", phase="move", swipetype="none" etc
-        }
+
+        // only trigger move left/right event , 因为目前不关注上下移动事件 
+        dir = (distX < 0)? 'left' : 'right';
+        handletouch(e, dir, 'move', swipeType, distX); // fire callback function with params dir="left|right", phase="move", swipetype="none" etc
+
+        // if (Math.abs(distX) > Math.abs(distY)){ // if distance traveled horizontally is greater than vertically, consider this a horizontal movement
+        //     dir = (distX < 0)? 'left' : 'right';
+        //     handletouch(e, dir, 'move', swipeType, distX); // fire callback function with params dir="left|right", phase="move", swipetype="none" etc
+        // }
+        // else{ // else consider this a vertical movement
+        //     dir = (distY < 0)? 'up' : 'down';
+        //     handletouch(e, dir, 'move', swipeType, distY); // fire callback function with params dir="up|down", phase="move", swipetype="none" etc
+        // }
         e.preventDefault(); // prevent scrolling when inside DIV
         // touchmove 事件中必须执行 preventDefault() , 否则ipad safari 中会导致图像失去 transition 中的动画效果。具体原因可能是此事件引发 去除动画效果的代码执行。
       })
@@ -1052,8 +1114,8 @@ PictureWall.prototype.showOrHidePlayerControl = function () {
         elapsedTime = new Date().getTime() - startTime; // get time elapsed
         var left_right_speed = Math.abs(distX/elapsedTime);
         var up_down_speed = Math.abs(distY/elapsedTime);
-        console.log("left/right speed=" + left_right_speed);
-        console.log("up/down speed=" + up_down_speed);
+        // console.log("left/right speed=" + left_right_speed);
+        // console.log("up/down speed=" + up_down_speed);
         if (left_right_speed>=0.3 && Math.abs(distY) <= restraint) {
           swipeType = dir;
         }
