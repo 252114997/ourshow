@@ -12,9 +12,9 @@
     <div class="site-background filter-blur">
     </div>
 
-    <div class="cover-continer-my" >
+    <div class="cover-continer" >
 
-          <div class="cover-inner-my" >
+          <div class="cover-inner" >
 
           @if (isset($deny_info))
 
