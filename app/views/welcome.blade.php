@@ -151,6 +151,18 @@
 
 <script type="text/javascript">
 
+function img_transform_scale(scale_now) {
+  var css = {
+          // 'text-indent': scale_now,
+    '-webkit-transform': "scale(" + scale_now + ", " + scale_now + ")",
+       '-moz-transform': "scale(" + scale_now + ", " + scale_now + ")",
+        '-ms-transform': "scale(" + scale_now + ", " + scale_now + ")",
+         '-o-transform': "scale(" + scale_now + ", " + scale_now + ")",
+            'transform': "scale(" + scale_now + ", " + scale_now + ")"
+  };
+  return css;
+};
+
 var picture_wall = new PictureWall();
 
 $(function(){
@@ -216,26 +228,17 @@ var random_backgrounds = $.extend(true, [], random_backgrounds_bak);
  * @brief 随机更换背景
  */
 function initBackground() {
-  var scale_now = 1;
+  var scale_now = 1.1;
   $('div.site-background')
-    .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
-    .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
-    .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
-    .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
-    .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
-    .css('text-indent', 1);
+    .css(img_transform_scale(scale_now))
+    .css('text-indent', scale_now);
 
   $.timer(function() {
     var background_front = $('div.site-background-front');
-    background_front.animate({textIndent: 1.1}, {
-      duration: 10000, 
+    background_front.animate({textIndent: 1.2}, {
+      duration: 20*1000, 
       step: function(scale_now, fx) {
-        $(this)
-          .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+        $(this).css(img_transform_scale(scale_now));
       }
     });
   }).once(0);
@@ -279,17 +282,15 @@ function shuffleBackground() {
       queue: false,
       duration: 800, 
       step: function(scale_now,fx) {
-        $(this)
-          .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
-          .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+        $(this).css(img_transform_scale(scale_now));
       },
       complete: function() {
         // console.debug('background_front zoom in completed.');
         // console.debug('index=' + index);
-
+        var scale = 1.1;
+        background_back
+          .css(img_transform_scale(scale))
+          .css('text-indent', scale);
         // 淡出当前图像 淡入下一张图像
         background_back.animate({opacity: 1}, {duration: 2000});
         background_front.animate({opacity: 0}, {
@@ -301,15 +302,10 @@ function shuffleBackground() {
             // 放大下一张图像
             background_front.removeClass('site-background-front').addClass('site-background-back');
             background_back.removeClass('site-background-back').addClass('site-background-front');
-            background_back.animate({textIndent: 1.1}, {
-              duration: 10000, 
+            background_back.animate({textIndent: 1.2}, {
+              duration: 20*1000, 
               step: function(scale_now, fx) {
-                $(this)
-                  .css('-webkit-transform',"scale(" + scale_now + ", " + scale_now + ")")
-                  .css('-moz-transform',"scale(" + scale_now + ", " + scale_now + ")")
-                  .css('-ms-transform',"scale(" + scale_now + ", " + scale_now + ")")
-                  .css('-o-transform',"scale(" + scale_now + ", " + scale_now + ")")
-                  .css('transform',"scale(" + scale_now + ", " + scale_now + ")")
+                $(this).css(img_transform_scale(scale_now));
               },
               complete: function() {
                 // console.debug('background_front switch to background_back completed.');

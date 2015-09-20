@@ -172,6 +172,12 @@
         -ms-transform: translate3d( 0px, 50%, 0px);
          -o-transform: translate3d( 0px, 50%, 0px);
             transform: translate3d( 0px, 50%, 0px);
+            
+    -webkit-transition: -webkit-transform 0.8s ease;
+       -moz-transition: transform 0.8s ease;
+        -ms-transition: transform 0.8s ease;
+         -o-transition: transform 0.8s ease;
+            transition: transform 0.8s ease;
 }
 
 .black-background {
@@ -247,12 +253,6 @@
 
 .timeline-body img{
     width: 100%;
-
-    -webkit-transition: -webkit-transform 0.8s ease;
-       -moz-transition: transform 0.8s ease;
-        -ms-transition: transform 0.8s ease;
-         -o-transition: transform 0.8s ease;
-            transition: transform 0.8s ease;
 }
 
 /*
