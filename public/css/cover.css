@@ -274,8 +274,6 @@ body {
        -o-box-shadow: inset 0 0 100px rgba(0,0,0,.7);
           box-shadow: inset 0 0 100px rgba(0,0,0,.7);
   ;
-  background-color: #333; /* 黑灰色的背景 */
-
 }
 .site-background-front {
   z-index: -1;
@@ -285,7 +283,7 @@ body {
 }
 
 body {
-  background: #333; 
+  background-color: rgb(245, 245, 213); 
   /* 在 site-background 后设置 body 为黑色背景，才能使界面 shadow 变成黑色*/
   /* 如果在 site-background 前设置 body为黑色背景，就看不到 site-background 的北京图片了 */
   /* 暂时不理解为什么？ */

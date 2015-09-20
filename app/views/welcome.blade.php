@@ -53,7 +53,7 @@
                 <div class="timeline-panel hide-caption">
                   <div class="timeline-body">
                     <img src='{{ URL::to("/get-picture")."/".$ablum["picture_id"]["id"] }}' 
-                      class="{{ rand(0,1) ? 'img-circle' : 'img-rounded' }}" />
+                      class="img-rounded" />
 
                     <div class="description">
                       <h2 class="title">{{ $ablum['title'] }}</h2>
@@ -62,7 +62,7 @@
 
                     <div class="buttons">
                       <a class="btn btn-xs btn-default" 
-                          onclick="showPictureWall({{ $ablum['id'] }});"
+                          onclick="showPictureWall({{ $ablum['id'] }}, '{{ $ablum['title'] }}');"
                         ><i class="glyphicon glyphicon-blackboard" ></i> 更多</a>
                       <a class="btn btn-xs {{ $ablum['likeit'] ? 'btn-danger' : 'btn-default' }}" 
                           data-toggle="tooltip" data-placement="top" 
@@ -115,10 +115,20 @@
                     <li class="right_img" ><img /></li>
                   </ul>
                   <div class="info">
+                    <div class="page">
+                      <span class="current">1</span>/<span class="sum">1</span>
+                    </div>
                     <h2 class="name">name</h2>
                     <span class="caption">caption</span>
                   </div>
                 </div>
+            </div>
+            <div class="picplayer-control-header">
+              <a class="picplayer-control-close" onclick="hidePictureWall(event);">
+                  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                  <span class="sr-only">Close</span>
+              </a>
+              <h4 class="picplayer-control-title">title</h4>
             </div>
             <a class="picplayer-control-last" onclick="showPictureWallLast(event);">
                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
@@ -128,10 +138,6 @@
             <a class="picplayer-control-next" onclick="showPictureWallNext(event);">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
-            </a>
-            <a class="picplayer-control-close" onclick="hidePictureWall(event);">
-                <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
-                <span class="sr-only">Close</span>
             </a>
 
         </div>
@@ -194,10 +200,10 @@ $(function(){
   });
 
   // 相册图片出现时，渐显效果
-  $('.timeline-body img').appear();
-  $(document.body).on('appear', '.timeline-body img', function(event, $all_appeared_elements) {
+  $('.timeline-body').appear();
+  $(document.body).on('appear', '.timeline-body', function(event, $all_appeared_elements) {
     $all_appeared_elements.each(function() {
-      $(this).css('opacity', 1);
+      $(this).css(img_transform_y(0));
     });
   });
 });
@@ -509,8 +515,8 @@ function hidePictureWall(event) {
   picture_wall.hide();
 }
 
-function showPictureWall(ablum_id) {
-  picture_wall.show(ablum_id);
+function showPictureWall(ablum_id, ablum_title) {
+  picture_wall.show(ablum_id, ablum_title);
 }
 
 function showPictureWallNext(e) {
@@ -535,7 +541,7 @@ function showPictureWallLast(e) {
 /**
  * @brief 常用 CSS ，写成 js 变量，方便复用
  */
-function img_transform(x) {
+function img_transform_x(x) {
   var css = {
     // '-webkit-transform': 'translateX(' + x + 'px)',
     //    '-moz-transform': 'translateX(' + x + 'px)',
@@ -550,14 +556,24 @@ function img_transform(x) {
   };
   return css;
 };
+function img_transform_y(x) {
+  var css = {
+    '-webkit-transform': 'translate3d(0px, ' + x + 'px, 0px)',
+       '-moz-transform': 'translate3d(0px, ' + x + 'px, 0px)',
+        '-ms-transform': 'translate3d(0px, ' + x + 'px, 0px)',
+         '-o-transform': 'translate3d(0px, ' + x + 'px, 0px)',
+            'transform': 'translate3d(0px, ' + x + 'px, 0px)'
+  };
+  return css;
+};
 function left_img_pos(offset) {
-  return img_transform( -$(window).width() + parseInt(offset) );
+  return img_transform_x( -$(window).width() + parseInt(offset) );
 };
 function middle_img_pos(offset) {
-  return img_transform( 0 + parseInt(offset) );
+  return img_transform_x( 0 + parseInt(offset) );
 };
 function right_img_pos(offset) {
-  return img_transform( +$(window).width() + parseInt(offset) );
+  return img_transform_x( +$(window).width() + parseInt(offset) );
 };
 
 /**
@@ -587,6 +603,8 @@ function PictureWall() {
   var player_control_close = parent_div.find('.picplayer-content > .picplayer-control-close');
   var picture_list = parent_div.find('.picplayer-content > .picplayer-canvas > .item > ul');
   var picture_info = parent_div.find('.picplayer-content > .picplayer-canvas > .item > .info');
+  var ablum_title = parent_div.find('.picplayer-content > .picplayer-control-header > .picplayer-control-title');
+  var ablum_header = parent_div.find('.picplayer-content > .picplayer-control-header');
 
   this._element_parent_div = parent_div;
   this._element_player_control_last = player_control_last;
@@ -594,6 +612,8 @@ function PictureWall() {
   this._element_player_control_close = player_control_close;
   this._element_picture_list = picture_list;
   this._element_picture_info = picture_info;
+  this._element_ablum_title = ablum_title;
+  this._element_ablum_header = ablum_header;
 
   this._picture_array = [];
   this._picture_info_array = [];
@@ -605,7 +625,7 @@ function PictureWall() {
       console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
       this_ptr.hidePlayerControl();
     },
-    5 * 1000,
+    25 * 1000,
     false
   );
   this._timer_ptr = timer_ptr;
@@ -718,7 +738,7 @@ PictureWall.prototype.bindTouchEvent = function() {
 /**
  * @brief 更新照片列表
  */
-PictureWall.prototype.show = function (ablum_id) {
+PictureWall.prototype.show = function (ablum_id, ablum_title) {
   var this_ptr = this;
   this._ablum_id = ablum_id;
 
@@ -735,7 +755,7 @@ PictureWall.prototype.show = function (ablum_id) {
       if (data.status) {
         console.debug("get-pictures ok! ablum_id=" + ablum_id);
         if (data.data.rows.length > 0) {
-          this_ptr.reloadPictureList(data.data.rows);
+          this_ptr.reloadPictureList(data.data.rows, ablum_title);
         }
         else {
           this_ptr.hide();
@@ -754,7 +774,7 @@ PictureWall.prototype.show = function (ablum_id) {
 /**
  * @brief 初始化照片墙
  */
-PictureWall.prototype.reloadPictureList = function (picture_id_array) {
+PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_title) {
   console.log("reloadPictureList() 1");
   this._picture_array = [];
   this._picture_info_array = [];
@@ -767,10 +787,11 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array) {
       console.log(this_ptr._picture_array[this_ptr._picture_array.length-1]);
   });
 
-  // TODO 将pic_list改为成员变量
+  this._element_ablum_title.text(ablum_title);
+
   var pic_list = this._element_picture_list;
   pic_list.empty();
-
+ 
   var src_param = '?width=' + $(window).width() + '&height=' + $(window).height();
   var index_left = null;
   var index_middle = null;
@@ -789,6 +810,8 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array) {
     var pic_info = this._element_picture_info;
     pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
     pic_info.find('.caption').html(this._picture_info_array[this._picture_index].caption);
+    pic_info.find('.page > .current').html(this._picture_index+1);
+    pic_info.find('.page > .sum').html(this._picture_array.length);
 
     var image_url2 = this._picture_array[index_middle]+src_param;
     console.debug('append index_middle=' + index_middle + ', url=' + image_url2);
@@ -907,6 +930,7 @@ PictureWall.prototype.next = function (rate) {
 
   pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
   pic_info.find('.caption').html(this._picture_info_array[this._picture_index].caption);
+  pic_info.find('.page > .current').html(this._picture_index+1);
 
   this.showOrHideLastNextButton();
 }
@@ -960,6 +984,7 @@ PictureWall.prototype.last = function (rate) {
 
   pic_info.find('.name').html(this._picture_info_array[this._picture_index].name);
   pic_info.find('.caption').html(this._picture_info_array[this._picture_index].caption);
+  pic_info.find('.page > .current').html(this._picture_index+1);
 
   this.showOrHideLastNextButton();
 }
@@ -1016,7 +1041,9 @@ PictureWall.prototype.showPlayerControl = function () {
   this._element_picture_info
     .css('pointer-events', 'auto')
     .removeClass('hidden_element');
-  this._element_picture_list.css('opacity', '0.8');
+  this._element_ablum_header
+    .css('pointer-events', 'auto')
+    .removeClass('hidden_element');
 
   // 使用定时器，将左右按钮隐藏
   this._timer_ptr.stop();
@@ -1029,7 +1056,7 @@ PictureWall.prototype.hidePlayerControl = function () {
   this._element_player_control_next.addClass('hidden_element').css('pointer-events', 'none');
   this._element_player_control_close.addClass('hidden_element').css('pointer-events', 'none');
   this._element_picture_info.addClass('hidden_element').css('pointer-events', 'none');
-  this._element_picture_list.css('opacity', '1');
+  this._element_ablum_header.addClass('hidden_element').css('pointer-events', 'none');
   this._timer_ptr.stop();
 }
 

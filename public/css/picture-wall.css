@@ -4,7 +4,7 @@
 .picplayer {
   position:fixed;
 
-  background: #333; /*黑灰色的背景*/
+  background-color: rgb(51, 51, 51); /*黑灰色的背景*/
   z-index: 999;
   overflow: hidden;
 
@@ -33,6 +33,30 @@
 .picplayer-content {
   width: 100%;
   height: 100%;
+}
+
+.picplayer-control-header {
+  z-index: 101;
+  position: absolute;
+  left: 0px;
+
+  width: 100%;
+  height: 40px;
+  border-bottom: 1px solid #343536;
+  background: #1C1D1E;
+}
+.picplayer-control-close{
+  float: left;
+  font-size: 32px;
+  /*鼠标变成小手*/
+  cursor: pointer;
+}
+.picplayer-control-close > .glyphicon-share-alt{
+  transform:rotate(230deg);
+  -ms-transform:rotate(230deg); /* Internet Explorer */
+  -moz-transform:rotate(230deg); /* Firefox */
+  -webkit-transform:rotate(230deg); /* Safari 和 Chrome */
+  -o-transform:rotate(230deg); /* Opera */
 }
 
 .picplayer-control-next,
@@ -94,29 +118,6 @@
   right: 20%;
 }
 
-.picplayer-control-close {
-  z-index: 100;
-  position: absolute;
-  bottom: 50%;
-  right: 50%;
-  
-  margin: 0;
-  padding: 0;
-
-  -moz-transform: translateX(50%) translateY(50%);
-  -webkit-transform: translateX(50%) translateY(50%);
-  -o-transform: translateX(50%) translateY(50%);
-  -ms-transform: translateX(50%) translateY(50%);
-  transform: translateX(50%) translateY(50%);
-
-  /*使箭头变成白色*/
-  font-size: 64px;
-  color: #bbb;
-
-  /*鼠标变成小手*/
-  cursor: pointer;
-
-}
 .picplayer-control-next:hover,
 .picplayer-control-last:hover,
 .picplayer-control-close:hover {
@@ -210,7 +211,21 @@
   line-height: 13px;
   font-style: italic;
   padding: 5px;
-  background: rgba(0,0,0,0.5);
+  /*background: rgba(0,0,0,0.5);*/
+  background: rgba(51, 51, 51, 0.5);
+}
+
+.picplayer-canvas > div.item > .info > .page {
+  font-size: 20px;
+  color: #A5A5A5;
+  float: right;
+  display: inline-block;
+  line-height: 40px;
+}
+
+.picplayer-canvas > div.item > .info > .page > .current {
+  color: #BB2C34;
+  font-size: 26px;
 }
 
 .picplayer-process {
