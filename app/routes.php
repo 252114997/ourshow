@@ -13,7 +13,6 @@
 
 
 Route::any('/carousel', 'MainFrameController@carousel');
-Route::any('/cover', 'MainFrameController@cover');
 Route::any('/testp', 'MainFrameController@testp');
 
 
@@ -25,6 +24,8 @@ Route::any('/login', 'MainFrameController@login');
 //
 Route::group(array('before' => 'auth'), function() {
 	Route::any('/welcome', 'MainFrameController@welcome');
+	Route::any('/cover', 'MainFrameController@cover');
+	Route::any('/timeline', 'MainFrameController@timeline');
 
 	Route::get('/get-comments/{ablum_id}', 'MainFrameController@getComments');
 	Route::post('/add-comments/{ablum_id}', 'MainFrameController@addComments');

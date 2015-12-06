@@ -13,27 +13,112 @@
 
 @section('body')
 
-    <div class="site-background site-background-front" 
-      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_backgrounds'][rand(0, count($param['random_backgrounds'])-1)] }}?width=800&height=800)"></div>
-    <div class="site-background site-background-back"
-      style=""></div>
+    <div id="timeline_continer" class="container">
+        <div class="page-header">
+            <h1 id="timeline">时光机</h1>
+        </div>
+        <ul class="timeline">
 
-    <div class="cover-continer" >
+            @foreach ($param['ablums'] as $index => $ablum) 
+              <li id="ablum_{{ $ablum['id'] }}" class="{{ ($index%2) ? 'timeline-inverted' : '' }}">
+                
+                <div class="timeline-badge {{ ($index%2) ? 'icon-footprint-left' : 'icon-footprint-right' }}" 
+                    data-toggle="tooltip" data-placement="top" 
+                    title="{{ $ablum['tips'] }}" ><i class="glyphicon glyphicon-time" ></i>
+                </div>
 
-          <div class="cover-inner" onclick="shuffleBackground();" >
-            <h1 class="cover-heading">见证我们爱情</h1>
-            <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
-            <p class="lead">时间：2015-05-03 11:00</p>
-            <p class="lead">地址：北京市长安街北京饭店 <a href="http://todo.com">查看地图</a></p>
+                <div class="timeline-panel hide-caption">
+                  <div class="timeline-body">
+                    <img src='{{ URL::to("/get-picture")."/".$ablum["picture_id"]["id"] }}' 
+                      class="img-rounded" />
 
-          </div>
+                    <div class="description">
+                      <h2 class="title">{{ $ablum['title'] }}</h2>
+                      <p class="caption">{{ $ablum['caption'] }}</p>
+                    </div>
 
-          <div class="footer-info">
-            <a href="#timeline_continer" class="icon-button bounce" title="下拉显示更多"
-              onclick="$(this).hide();" >
-              <span class="glyphicon glyphicon-triangle-bottom" ></span>
+                    <div class="buttons">
+                      <a class="btn btn-xs btn-default" 
+                          onclick="showPictureWall({{ $ablum['id'] }}, '{{ $ablum['title'] }}');"
+                        ><i class="glyphicon glyphicon-blackboard" ></i> 更多</a>
+                      <a class="btn btn-xs {{ $ablum['likeit'] ? 'btn-danger' : 'btn-default' }}" 
+                          data-toggle="tooltip" data-placement="top" 
+                          title="{{ count($ablum['likes']) }} 人表示很赞"
+                          onclick='likeAblum(this, {{ $ablum["id"] }}); return false;' 
+                        ><i class="glyphicon glyphicon-thumbs-up" ></i> <span>赞({{ count($ablum['likes']) }})</span></a>
+                      <a class="btn btn-xs btn-default" 
+                          data-toggle="tooltip" data-placement="top" 
+                          onclick='toggleButtons(this); return false;' 
+                        ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
+                    </div>
+                  </div>
+
+                  <div class="container usercomment" style="display:none">
+                      <div class="text-center">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
+                              onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
+                            <span class="input-group-btn" onclick="addComment(this, {{ $ablum['id'] }} );">     
+                              <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
+                            </span>
+                        </div>
+
+                        <hr/>
+                        <ul class="ourshow-commmentlist"
+                          data-options="url:'{{ URL::to('/get-comments').'/'.$ablum['id'] }}'" 
+                        ></ul>
+
+                      </div>
+                  </div>
+                </div>
+              </li>
+            @endforeach
+
+        </ul>
+    </div>
+
+    <div id="footer_info" class="mastfoot mastfoot-ext">
+        <p>由<a > WS & TT </a>提供强劲技术支持</p>
+    </div>
+
+
+    <div id="picture_player" class="picplayer plcplayer-animate-start">
+        <div class="picplayer-content" onclick="showOrHidePlayerControl(this);">
+            <div class="picplayer-canvas" >
+                <div class="item" >
+                  <ul >
+                    <li class="left_img" ><img /></li>
+                    <li class="middle_img" ><img /></li>
+                    <li class="right_img" ><img /></li>
+                  </ul>
+                  <div class="info">
+                    <div class="page">
+                      <span class="current">1</span>/<span class="sum">1</span>
+                    </div>
+                    <h2 class="name">name</h2>
+                    <span class="caption">caption</span>
+                  </div>
+                </div>
+            </div>
+            <div class="picplayer-control-header">
+              <a class="picplayer-control-close" onclick="hidePictureWall(event);">
+                  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                  <span class="sr-only">Close</span>
+              </a>
+              <h4 class="picplayer-control-title">title</h4>
+            </div>
+            <a class="picplayer-control-last" onclick="showPictureWallLast(event);">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
             </a>
-          </div>
+            
+            <a class="picplayer-control-next" onclick="showPictureWallNext(event);">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+
+        </div>
+
     </div>
 
 @stop

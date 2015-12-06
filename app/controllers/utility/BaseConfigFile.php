@@ -437,6 +437,12 @@ class FreeMonitorIPConfig extends BaseConfigFile
 	static public $split_charactor = "\t";
 }
 
+class BlackListIPConfig extends BaseConfigFile
+{
+	static public $filepath = "/etc/sysconfig/drop_user";
+	static public $split_charactor = "\t";
+}
+
 /**
  * @brief 免监控应用设置 
  */

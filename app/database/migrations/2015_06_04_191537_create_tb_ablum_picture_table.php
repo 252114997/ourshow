@@ -15,7 +15,7 @@ class CreateTbAblumPictureTable extends Migration {
 		Schema::create('tb_ablum_picture', function(Blueprint $table)
 		{
 			$table->integer('ablum_id')->nullable();
-			$table->integer('picture_id')->nullable();
+			$table->string('picture_id')->nullable();
 			$table->timestamps();
 		});
 	}

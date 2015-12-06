@@ -18,7 +18,7 @@ class CreateTbAblumsTable extends Migration {
 			$table->string('title')->nullable();
 			$table->string('caption')->nullable();
 			$table->string('tips')->nullable();
-			$table->integer('picture_id')->nullable();
+			$table->string('picture_id')->nullable();
 			$table->timestamps();
 		});
 	}

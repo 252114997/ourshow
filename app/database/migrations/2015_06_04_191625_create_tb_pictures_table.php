@@ -14,7 +14,8 @@ class CreateTbPicturesTable extends Migration {
 	{
 		Schema::create('tb_pictures', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+			// $table->integer('id', true);
+			$table->string('id')->primary();
 			$table->string('name')->nullable();
 			$table->string('path')->nullable();
 			$table->string('caption')->nullable();

@@ -30,7 +30,7 @@ class MainFrameController extends BaseController {
 	public function getPictures($ablum_id) {
 
 		$page = intval(Input::get('page', '1'));
-		$rows = intval(Input::get('rows', '6'));
+		$rows = intval(Input::get('rows', '50'));
 
 		$items = self::getPicturesOfAblum($ablum_id, $page, $rows);
 
@@ -49,7 +49,9 @@ class MainFrameController extends BaseController {
 		}
 
 		$param = array();
-		$param['path'] = $item['path'];
+		$param['path'] = storage_path().$item['path'];
+		$param['path'] = iconv('utf-8','GBK',$param['path']);
+
 		$param['height'] = intval(Input::get('height', 320));
 		$param['width']  = intval(Input::get('width', 320));
 		$param['use_cache'] = intval(Input::get('cache', 1));
@@ -96,7 +98,6 @@ class MainFrameController extends BaseController {
 
 	public function welcome() {
 		$user_id = UserAuthController::getLoginUserid();
-		// $user_id = 1; // TODO test
 		$page = intval(Input::get('page', '1'));
 		$rows = intval(Input::get('rows', '6'));
 
@@ -131,14 +132,8 @@ class MainFrameController extends BaseController {
 			);
 	}
 
-
-	public function carousel() {
-		return View::make('carousel');
-	}
-
 	public function cover() {
 		$user_id = UserAuthController::getLoginUserid();
-		// $user_id = 1; // TODO test
 		$page = intval(Input::get('page', '1'));
 		$rows = intval(Input::get('rows', '6'));
 
@@ -159,8 +154,58 @@ class MainFrameController extends BaseController {
 			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
 		}
 
+		// 随机播放图片
+		$directory = 'img/background';
+		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
+
 		return View::make('cover')
-			->with('param', $items);
+			->with(
+				'param', 
+				array(
+					'ablums' => $items, 
+					'random_backgrounds' => $scanned_directory,
+				)
+			);
+	}
+
+	public function timeline() {
+		$user_id = UserAuthController::getLoginUserid();
+		$page = intval(Input::get('page', '1'));
+		$rows = intval(Input::get('rows', '6'));
+
+		$total = tb_ablums::select()->count();
+		$offset = ($page - 1) * $rows;
+
+		$items = tb_ablums::select()
+			->orderBy('created_at', 'asc')
+			->skip($offset)
+			->take($rows)
+			->get()
+			->toArray();
+
+		foreach ($items as $key => &$value) {
+			$value['picture_id'] = tb_pictures::find($value['picture_id'])->toArray();
+			$value['likes'] = self::getLikesOfAblum($value['id']);
+			$value['likeit'] = self::isLikeIt($value['id'], $user_id);
+			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
+		}
+
+		// 随机播放图片
+		$directory = 'img/background';
+		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
+
+		return View::make('timeline')
+			->with(
+				'param', 
+				array(
+					'ablums' => $items, 
+					'random_backgrounds' => $scanned_directory,
+				)
+			);
+	}
+
+	public function carousel() {
+		return View::make('carousel');
 	}
 
 	public function addComments($ablum_id) {
@@ -285,12 +330,15 @@ class MainFrameController extends BaseController {
 		$param['height'] = $max_length;
 		$param['width']  = $max_length;
 
-		Util::log_debug(json_encode($param));
+		// var_dump(Util::safe_json_encode($param['path']));
+		// echo json_last_error_msg (); die;
+		LOG::debug(Util::safe_json_encode($param['path']));
+		LOG::debug(($param['path']));
 
 		$content_datas = array();
 		if ($param['use_cache']) {
 			Util::log_debug("use_cache!");
-			$content_datas = Cache::rememberForever(json_encode($param), function() use ($param) {
+			$content_datas = Cache::rememberForever(Util::safe_json_encode($param), function() use ($param) {
 				// 使用cache提高性能
 				Util::log_debug("use_cache! in cache first get");
 				$content = self::scaleImageFileToBlob($param);

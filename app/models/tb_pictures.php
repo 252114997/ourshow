@@ -12,6 +12,7 @@ class tb_pictures extends Eloquent {
 		'id', 
 		'name', 
 		'path',
+		'caption',
 		'created_at', 
 		'updated_at',
 	);
