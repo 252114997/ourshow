@@ -687,8 +687,7 @@ PictureWall.prototype.bindTouchEvent = function() {
       var end_time = new Date();
       var time = end_time.getTime()- this._start_time.getTime(); // ms
       var rate = 0;
-      rate = time / Math.abs(distance); // 这里算的其实不是速度，只是时间与距离的比率
-      rate = (rate>4) ? 4 : (rate*0.8); // *0.8 可加快移动速度
+      rate = time / Math.abs(distance); // 这里算的其实不是速度，只是时间与距离的比率。 此处数值越小，图片移动速度越快
 
       // console.log("end distance=" + distance);
       // console.log("end time=" + time + ',rate =' + rate);
@@ -875,6 +874,7 @@ PictureWall.prototype.getLastPictureIndex = function () {
  */
 PictureWall.prototype.next = function (rate) {
   console.debug("next()");
+  rate = (rate>0.7) ? 0.7 : rate; // 切换图片时，图片移动速度稍快些
   var right_index = null;
   if (null === (right_index = this.getNextPictureIndex())) {
     this.reset(rate);
@@ -933,6 +933,7 @@ PictureWall.prototype.next = function (rate) {
 
 PictureWall.prototype.last = function (rate) {
   console.debug("last()");  
+  rate = (rate>0.7) ? 0.7 : rate; // 切换图片时，图片移动速度稍快些
   var left_index = null;
   if (null === (left_index = this.getLastPictureIndex())) {
     this.reset(rate);
@@ -987,6 +988,7 @@ PictureWall.prototype.last = function (rate) {
 
 PictureWall.prototype.reset = function (rate) {
   console.debug("reset()");
+  rate = (rate<0.2) ? 0.2 : rate; // 还原位置时，图片移动速度稍慢些
   var pic_list = this._element_picture_list;
   var left_img = pic_list.find('li.left_img');
   var middle_img = pic_list.find('li.middle_img');
