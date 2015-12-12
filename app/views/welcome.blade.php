@@ -336,7 +336,7 @@ function doLikeit(button, likeit) {
 }
 
 function likeAblum (button, ablum_id) {
-  console.debug('likeAblum');
+  // console.debug('likeAblum');
 
   button = $(button);
   var likeit = button.hasClass('btn-danger');
@@ -369,7 +369,7 @@ function likeAblum (button, ablum_id) {
 }
 
 function toggleButtons(button) {
-  console.debug('toggleButtons');
+  // console.debug('toggleButtons');
 
   button = $(button);
   var comment = button.closest('li').find('.usercomment');
@@ -418,7 +418,7 @@ function pageComment(page_button) {
   data_options_string = $.rtrim(data_options_string, '}');
 
   // console.debug('param data_options=' +  $.param(data_options));
-  console.debug('json  data_options=' +  data_options_string);
+  // console.debug('json  data_options=' +  data_options_string);
   commmentlist.attr('data-options', data_options_string);
   reloadComment(commmentlist);
 }
@@ -480,7 +480,7 @@ function reloadComment(commmentlist) {
           var text = i;
           var start = String(i).length;
           var end = String(page_sum).length;
-          console.debug('i.length=' + start + ', page_sum.length=' + end);
+          // console.debug('i.length=' + start + ', page_sum.length=' + end);
           for (var space_count = start; space_count <= end; space_count++) {
             text = '&nbsp;' + text + '&nbsp;';
           };
@@ -500,7 +500,7 @@ function reloadComment(commmentlist) {
  * @brief 照片墙功能的事件响应函数
  */
 function showOrHidePlayerControl() {
-  console.debug('showOrHidePlayerControl');
+  // console.debug('showOrHidePlayerControl');
   if ( picture_wall.isShowPlayerControl()) {
     picture_wall.hidePlayerControl();
   }
@@ -518,7 +518,7 @@ function showPictureWall(ablum_id, ablum_title) {
 }
 
 function showPictureWallNext(e) {
-  console.debug('showPictureWallNext');
+  // console.debug('showPictureWallNext');
   picture_wall.next(1);
   picture_wall.showPlayerControl();
 
@@ -526,7 +526,7 @@ function showPictureWallNext(e) {
   e.preventDefault();
 }
 function showPictureWallLast(e) {
-  console.debug('showPictureWallLast');
+  // console.debug('showPictureWallLast');
   picture_wall.last(1);
   picture_wall.showPlayerControl();
 
@@ -620,7 +620,7 @@ function PictureWall() {
 
   var timer_ptr = $.timer(
     function() {
-      console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
+      // console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
       this_ptr.hidePlayerControl();
     },
     25 * 1000,
@@ -670,7 +670,7 @@ PictureWall.prototype.bindTouchEvent = function() {
       // console.log('_right_x=' + this._right_x); 
     }
     else if (phase == 'move') {
-      console.log("move");
+      // console.log("move");
       if ((dir =='left') || (dir =='right')){ //  on touchmove and if moving left or right
         // console.debug('distance offset = ' + distance);
         // < < < 左右 > > > 移动
@@ -719,12 +719,12 @@ PictureWall.prototype.bindTouchEvent = function() {
           }
         }
         else {
-          console.info("showPictureWallReset() 1 ...");
+          // console.info("showPictureWallReset() 1 ...");
           this_ptr.reset(rate);
         }
       }
       else {
-        console.info("showPictureWallReset() 2 ...");
+        // console.info("showPictureWallReset() 2 ...");
         this_ptr.reset(rate);
       }
     }
@@ -750,7 +750,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
     null, // data
     function(data) {
       if (data.status) {
-        console.debug("get-pictures ok! ablum_id=" + ablum_id);
+        // console.debug("get-pictures ok! ablum_id=" + ablum_id);
         if (data.data.rows.length > 0) {
           this_ptr.reloadPictureList(data.data.rows, ablum_title);
         }
@@ -761,7 +761,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
 
       }
       else {
-        console.debug("get-pictures fail!");
+        // console.debug("get-pictures fail!");
       }
     },     // callback
     "json" // data type
@@ -772,7 +772,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
  * @brief 初始化照片墙
  */
 PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_title) {
-  console.log("reloadPictureList() 1");
+  // console.log("reloadPictureList() 1");
   this._picture_array = [];
   this._picture_info_array = [];
   this._picture_index = 0;
@@ -781,7 +781,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   picture_id_array.forEach(function(entry) {
       this_ptr._picture_array.push('{{ URL::to("/get-picture") }}' + '/' + entry.picture_id);
       this_ptr._picture_info_array.push(entry);
-      console.log(this_ptr._picture_array[this_ptr._picture_array.length-1]);
+      // console.log(this_ptr._picture_array[this_ptr._picture_array.length-1]);
   });
 
   this._element_ablum_title.text(ablum_title);
@@ -795,7 +795,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   var index_right = null;
   if (null !== (index_left = this.getLastPictureIndex())) {
     var image_url1 = this._picture_array[index_left]+src_param;
-    console.debug('append index_left=' + index_left + ', url=' + image_url1);
+    // console.debug('append index_left=' + index_left + ', url=' + image_url1);
     var left_img = $('<li class="left_img"><img src="img/ajax-loader.gif"></li>')
         .css(left_img_pos(0));
     pic_list.append(left_img);
@@ -811,7 +811,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
     pic_info.find('.page > .sum').html(this._picture_array.length);
 
     var image_url2 = this._picture_array[index_middle]+src_param;
-    console.debug('append index_middle=' + index_middle + ', url=' + image_url2);
+    // console.debug('append index_middle=' + index_middle + ', url=' + image_url2);
     var middle_img = $('<li class="middle_img"><img src="img/ajax-loader.gif"></li>')
         .css(middle_img_pos(0));
     pic_list.append(middle_img);
@@ -822,7 +822,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   }
   if (null !== (index_right = this.getNextPictureIndex())) {
     var image_url3 = this._picture_array[index_right]+src_param;
-    console.debug('append index_right=' + index_right + ', url=' + image_url3);
+    // console.debug('append index_right=' + index_right + ', url=' + image_url3);
     var right_img = $('<li class="right_img"><img src="img/ajax-loader.gif"></li>')
         .css(right_img_pos(0));
     pic_list.append(right_img);
@@ -832,7 +832,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   }
 
   this.showOrHideLastNextButton();
-  console.log("reloadPictureList() 3");
+  // console.log("reloadPictureList() 3");
 }
 
 /**
@@ -875,7 +875,7 @@ PictureWall.prototype.getLastPictureIndex = function () {
  * @brief 执行切换照片的操作
  */
 PictureWall.prototype.next = function (rate) {
-  console.debug("next()");
+  // console.debug("next()");
   rate = (rate>0.7) ? 0.7 : rate; // 切换图片时，图片移动速度稍快些
   var right_index = null;
   if (null === (right_index = this.getNextPictureIndex())) {
@@ -934,7 +934,7 @@ PictureWall.prototype.next = function (rate) {
 }
 
 PictureWall.prototype.last = function (rate) {
-  console.debug("last()");  
+  // console.debug("last()");
   rate = (rate>0.7) ? 0.7 : rate; // 切换图片时，图片移动速度稍快些
   var left_index = null;
   if (null === (left_index = this.getLastPictureIndex())) {
@@ -989,7 +989,7 @@ PictureWall.prototype.last = function (rate) {
 }
 
 PictureWall.prototype.reset = function (rate) {
-  console.debug("reset()");
+  // console.debug("reset()");
   rate = (rate<0.2) ? 0.2 : rate; // 还原位置时，图片移动速度稍慢些
   var pic_list = this._element_picture_list;
   var left_img = pic_list.find('li.left_img');
@@ -1027,7 +1027,7 @@ PictureWall.prototype.isShowPlayerControl = function () {
  * @brief 显示、隐藏 控制按钮
  */
 PictureWall.prototype.showPlayerControl = function () {
-  console.debug("showPlayerControl()");
+  // console.debug("showPlayerControl()");
 
   this._element_player_control_last
     .css('pointer-events', 'auto')
@@ -1050,7 +1050,7 @@ PictureWall.prototype.showPlayerControl = function () {
   this._timer_ptr.play();
 }
 PictureWall.prototype.hidePlayerControl = function () {
-  console.debug("hidePlayerControl()");
+  // console.debug("hidePlayerControl()");
 
   this._element_player_control_last.addClass('hidden_element').css('pointer-events', 'none');
   this._element_player_control_next.addClass('hidden_element').css('pointer-events', 'none');

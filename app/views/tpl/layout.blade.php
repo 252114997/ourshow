@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-	<link rel="shortcut icon" href="{{ asset('logo.ico') }}">
+	<link rel="shortcut icon" href="{{ asset('logo.jpg') }}">
 
     <!-- Bootstrap core CSS -->
 	<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.css') }}">
@@ -22,7 +22,7 @@
 
 	@yield('css')
 
-    <title>Carousel Template for Bootstrap</title>
+    <title>Just do IT</title>
 </head>
 <body >
 
@@ -44,5 +44,17 @@
  -->
 	@yield('js')
 
+    <script type="text/javascript">
+        console.log("Power by %cWS&TT","color:red");
+        console.log('Contact 252114997#qq.com');
+        console.log('');
+        console.log('╱╱╱╱╱╱╱╱╱╭━━━━┳━━━━╮');
+        console.log('╱╱╱╱╱╱╱╱╱┃╭╮╭╮┃╭╮╭╮┃');
+        console.log('╭╮╭╮╭┳━━╮╰╯┃┃╰┻╯┃┃╰╯');
+        console.log('┃╰╯╰╯┃━━┫╱╱┃┃╱╱╱┃┃');
+        console.log('╰╮╭╮╭╋━━┃╱╱┃┃╱╱╱┃┃');
+        console.log('╱╰╯╰╯╰━━╯╱╱╰╯╱╱╱╰╯');
+        console.log('@ 2015.12.12');
+    </script>
 </body>
 </html>
