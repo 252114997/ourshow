@@ -166,13 +166,13 @@
         -ms-box-shadow: 5px 5px 9px rgba(240,240,240, 0.5);
          -o-box-shadow: 5px 5px 9px rgba(240,240,240, 0.5);
             box-shadow: 5px 5px 9px rgba(240,240,240, 0.5);
-
+/*
     -webkit-transform: translate3d( 0px, 50%, 0px);
        -moz-transform: translate3d( 0px, 50%, 0px);
         -ms-transform: translate3d( 0px, 50%, 0px);
          -o-transform: translate3d( 0px, 50%, 0px);
             transform: translate3d( 0px, 50%, 0px);
-            
+*/
     -webkit-transition: -webkit-transform 0.8s ease;
        -moz-transition: transform 0.8s ease;
         -ms-transition: transform 0.8s ease;

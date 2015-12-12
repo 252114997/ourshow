@@ -29,8 +29,8 @@ class TbAblumsTableSeeder extends Seeder {
 				'caption' => '辗转来到大学，我们在茫茫人海中相识',
 				'tips' => '@ 2009.09.01',
 				'picture_id' => '9fcf40bb6ae65610975e5626a2c03af7',
-				'created_at' => '0000-00-00 00:00:00',
-				'updated_at' => '0000-00-00 00:00:00',
+				'created_at' => '2009-09-01 00:00:00',
+				'updated_at' => '2009-09-01 00:00:00',
 			),
 			2 => 
 			array (
@@ -39,18 +39,18 @@ class TbAblumsTableSeeder extends Seeder {
 				'caption' => '开始实习工作的前一天，我各位同学的见证下向她表白。感谢大家的祝福，特别感谢hl给我的勇气与支持。',
 				'tips' => '@ 2011.10.08',
 				'picture_id' => '09366bc7e9f9ee9bd250ea0490637f9b',
-				'created_at' => '0000-00-00 00:00:00',
-				'updated_at' => '0000-00-00 00:00:00',
+				'created_at' => '2011-10-08 00:00:00',
+				'updated_at' => '2011-10-08 00:00:00',
 			),
 			3 => 
 			array (
 				'id' => 4,
 				'title' => '工作',
-				'caption' => '工作不忙的时候，抽空出去于',
+				'caption' => '工作不忙的时候，抽空出去玩',
 				'tips' => '@ 2012.11.08',
-				'picture_id' => '6121c0e5106ee0924e1e00ccd3724bd0',
-				'created_at' => '0000-00-00 00:00:00',
-				'updated_at' => '0000-00-00 00:00:00',
+				'picture_id' => 'ca236b5b41003a4ab792ff0abf07dfbc',
+				'created_at' => '2012-10-08 00:00:00',
+				'updated_at' => '2012-10-08 00:00:00',
 			),
 		));
 	}

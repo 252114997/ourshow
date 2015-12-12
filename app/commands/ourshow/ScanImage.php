@@ -55,6 +55,12 @@ class ScanImageCommand extends Command {
 		return true;
 	}
 
+	public function grab_dump($var) {
+		ob_start();
+		var_dump($var);
+		return ob_get_clean();
+	}
+
 	const PATH_SEPERATOR = "\\";
 	public function scanPicture($scandir) {
 		if (!is_dir($scandir)) {
@@ -90,7 +96,7 @@ class ScanImageCommand extends Command {
 				// Log::debug('exif_data = '.json_encode($exif_data));
 				// die;
 				$md5 = md5_file($filepath);
-				$title = basename($filepath);
+				$title = basename($filepath, '.'.pathinfo($filepath)['extension']);
 				$path = substr($filepath, strlen(storage_path()));
 				$caption = "";
 
@@ -104,11 +110,11 @@ class ScanImageCommand extends Command {
 				$picture = tb_pictures::updateOrCreate(
 					array('id' => $md5),
 					$insert_values
-				);
-				var_dump($insert_values);
-				$this->info("insert pictures: ".json_encode($picture));
+				)->toArray();
+				$this->info("insert pictures: ".$this->grab_dump($picture));
 				$count += 1;
 			}
+			$this->info("");
 		}
 		$this->info("found {$count} pictures in directory {$scandir}!");
 		return $count;

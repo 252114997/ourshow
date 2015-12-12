@@ -21,11 +21,10 @@
     <div class="cover-continer" >
 
           <div class="cover-inner" onclick="shuffleBackground();" >
-            <h1 class="cover-heading">见证我们爱情</h1>
-            <p class="lead">欢迎xxxx参加新郎新娘的婚礼</p>
-            <p class="lead">时间：2015-05-03 11:00</p>
-            <p class="lead">地址：北京市长安街北京饭店 <a href="http://todo.com">查看地图</a></p>
-
+            <h1 class="cover-heading">见证爱情</h1>
+            <p class="lead">二十年擦肩而过</p>
+            <p class="lead">五年朝夕相伴</p>
+            <p class="lead">一生所爱</p>
           </div>
 
           <div class="footer-info">
@@ -166,7 +165,17 @@ function img_transform_scale(scale_now) {
 var picture_wall = new PictureWall();
 
 $(function(){
-  initBackground();
+
+  // // 初始化北京，逐渐放大
+  // initBackground();
+
+  // // 相册图片出现时，渐显效果
+  // $('.timeline-body').appear();
+  // $(document.body).on('appear', '.timeline-body', function(event, $all_appeared_elements) {
+  //   $all_appeared_elements.each(function() {
+  //     $(this).css(img_transform_y(0));
+  //   });
+  // });
 
   // 相册评论列表
   $('ul.ourshow-commmentlist').each(function(index, elem){
@@ -211,13 +220,6 @@ $(function(){
       });
   });
 
-  // 相册图片出现时，渐显效果
-  $('.timeline-body').appear();
-  $(document.body).on('appear', '.timeline-body', function(event, $all_appeared_elements) {
-    $all_appeared_elements.each(function() {
-      $(this).css(img_transform_y(0));
-    });
-  });
 });
 
 // 保证每次更换的背景不重复

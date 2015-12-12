@@ -96,7 +96,8 @@ class MainFrameController extends BaseController {
 		return Response::make('此页面只能用GET/POST方法访问!', 404);
 	}
 
-	public function welcome() {
+	public function getAblums() {
+
 		$user_id = UserAuthController::getLoginUserid();
 		$page = intval(Input::get('page', '1'));
 		$rows = intval(Input::get('rows', '6'));
@@ -105,7 +106,7 @@ class MainFrameController extends BaseController {
 		$offset = ($page - 1) * $rows;
 
 		$items = tb_ablums::select()
-			->orderBy('created_at', 'asc')
+			->orderBy('created_at', 'desc')
 			->skip($offset)
 			->take($rows)
 			->get()
@@ -117,7 +118,11 @@ class MainFrameController extends BaseController {
 			$value['likeit'] = self::isLikeIt($value['id'], $user_id);
 			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
 		}
+		return $items;
+	}
+	public function welcome() {
 
+		$ablums = $this->getAblums();
 		// 随机播放图片
 		$directory = 'img/background';
 		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
@@ -126,34 +131,14 @@ class MainFrameController extends BaseController {
 			->with(
 				'param', 
 				array(
-					'ablums' => $items, 
+					'ablums' => $ablums, 
 					'random_backgrounds' => $scanned_directory,
 				)
 			);
 	}
 
 	public function cover() {
-		$user_id = UserAuthController::getLoginUserid();
-		$page = intval(Input::get('page', '1'));
-		$rows = intval(Input::get('rows', '6'));
-
-		$total = tb_ablums::select()->count();
-		$offset = ($page - 1) * $rows;
-
-		$items = tb_ablums::select()
-			->orderBy('created_at', 'asc')
-			->skip($offset)
-			->take($rows)
-			->get()
-			->toArray();
-
-		foreach ($items as $key => &$value) {
-			$value['picture_id'] = tb_pictures::find($value['picture_id'])->toArray();
-			$value['likes'] = self::getLikesOfAblum($value['id']);
-			$value['likeit'] = self::isLikeIt($value['id'], $user_id);
-			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
-		}
-
+		$ablums = $this->getAblums();
 		// 随机播放图片
 		$directory = 'img/background';
 		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
@@ -162,34 +147,14 @@ class MainFrameController extends BaseController {
 			->with(
 				'param', 
 				array(
-					'ablums' => $items, 
+					'ablums' => $ablums, 
 					'random_backgrounds' => $scanned_directory,
 				)
 			);
 	}
 
 	public function timeline() {
-		$user_id = UserAuthController::getLoginUserid();
-		$page = intval(Input::get('page', '1'));
-		$rows = intval(Input::get('rows', '6'));
-
-		$total = tb_ablums::select()->count();
-		$offset = ($page - 1) * $rows;
-
-		$items = tb_ablums::select()
-			->orderBy('created_at', 'asc')
-			->skip($offset)
-			->take($rows)
-			->get()
-			->toArray();
-
-		foreach ($items as $key => &$value) {
-			$value['picture_id'] = tb_pictures::find($value['picture_id'])->toArray();
-			$value['likes'] = self::getLikesOfAblum($value['id']);
-			$value['likeit'] = self::isLikeIt($value['id'], $user_id);
-			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
-		}
-
+		$ablums = $this->getAblums();
 		// 随机播放图片
 		$directory = 'img/background';
 		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
@@ -198,7 +163,7 @@ class MainFrameController extends BaseController {
 			->with(
 				'param', 
 				array(
-					'ablums' => $items, 
+					'ablums' => $ablums, 
 					'random_backgrounds' => $scanned_directory,
 				)
 			);
