@@ -7,7 +7,7 @@ class MainFrameController extends BaseController {
 	 * @return image
 	 */
 	public function getBackground($filename) {
-		$directory = 'img/background/';
+		$directory = storage_path().'/img/background/';
 		$path = $directory.$filename;
 		if (!file_exists($path)) {
 			return;
@@ -15,11 +15,16 @@ class MainFrameController extends BaseController {
 
 		$param = array();
 		$param['path'] = $path;
-		$param['height'] = intval(Input::get('height', 320));
-		$param['width']  = intval(Input::get('width', 320));
+		$param['height'] = intval(Input::get('height', 770));
+		$param['width']  = intval(Input::get('width', 770));
 		$param['use_cache'] = intval(Input::get('cache', 1));
 
 		return self::returnCacheImage($param);
+	}
+	public function getAllBackgrounds() {
+		$directory = storage_path().'/img/background';
+		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
+		return $scanned_directory;
 	}
 
 
@@ -52,8 +57,8 @@ class MainFrameController extends BaseController {
 		$param['path'] = storage_path().$item['path'];
 		$param['path'] = iconv('utf-8','GBK',$param['path']);
 
-		$param['height'] = intval(Input::get('height', 320));
-		$param['width']  = intval(Input::get('width', 320));
+		$param['height'] = intval(Input::get('height', 770));
+		$param['width']  = intval(Input::get('width', 770));
 		$param['use_cache'] = intval(Input::get('cache', 1));
 
 		return self::returnCacheImage($param);
@@ -121,27 +126,24 @@ class MainFrameController extends BaseController {
 		return $items;
 	}
 	public function welcome() {
-
 		$ablums = $this->getAblums();
+		$backgrounds = $this->getAllBackgrounds();
+		$random_index = rand(0, count($backgrounds)-1);
 		// 随机播放图片
-		$directory = 'img/background';
-		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
-
 		return View::make('welcome')
 			->with(
 				'param', 
 				array(
 					'ablums' => $ablums, 
-					'random_backgrounds' => $scanned_directory,
+					'backgrounds' => $backgrounds,
+					'random_background' => $backgrounds[$random_index],
 				)
 			);
 	}
 
 	public function cover() {
 		$ablums = $this->getAblums();
-		// 随机播放图片
-		$directory = 'img/background';
-		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
+		$scanned_directory = $this->getAllBackgrounds();
 
 		return View::make('cover')
 			->with(
@@ -155,9 +157,7 @@ class MainFrameController extends BaseController {
 
 	public function timeline() {
 		$ablums = $this->getAblums();
-		// 随机播放图片
-		$directory = 'img/background';
-		$scanned_directory = array_values(array_diff(scandir($directory), array('..', '.')));
+		$scanned_directory = $this->getAllBackgrounds();
 
 		return View::make('timeline')
 			->with(
@@ -297,8 +297,7 @@ class MainFrameController extends BaseController {
 
 		// var_dump(Util::safe_json_encode($param['path']));
 		// echo json_last_error_msg (); die;
-		LOG::debug(Util::safe_json_encode($param['path']));
-		LOG::debug(($param['path']));
+		LOG::debug(Util::safe_json_encode($param));
 
 		$content_datas = array();
 		if ($param['use_cache']) {
@@ -368,17 +367,19 @@ class MainFrameController extends BaseController {
 	    $x_ratio = $max_width / $width;
 	    $y_ratio = $max_height / $height;
 
-	    if( ($width <= $max_width) && ($height <= $max_height) ){
-	        $tn_width = $width;
-	        $tn_height = $height;
-	        }elseif (($x_ratio * $height) < $max_height){
-	            $tn_height = ceil($x_ratio * $height);
-	            $tn_width = $max_width;
-	        }else{
-	            $tn_width = ceil($y_ratio * $width);
-	            $tn_height = $max_height;
+	    if ( ($width <= $max_width) && ($height <= $max_height) ) {
+			$tn_width = $width;
+			$tn_height = $height;
+		} else if (($x_ratio * $height) < $max_height) {
+			$tn_height = ceil($x_ratio * $height);
+			$tn_width = $max_width;
+		} else {
+			$tn_width = ceil($y_ratio * $width);
+			$tn_height = $max_height;
 	    }
 
+		LOG::debug('tn_width='.$tn_width);
+		LOG::debug('tn_height='.$tn_width);
 	    $tmp = imagecreatetruecolor($tn_width,$tn_height);
 
 	    /* Check if this image is PNG or GIF, then set if Transparent*/

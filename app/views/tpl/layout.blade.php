@@ -38,7 +38,8 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 	<script src="{{ asset('js/ie10-viewport-bug-workaround.js') }}"></script>
 
-	<script src="{{ asset('js/jquery.timer.js') }}"></script>
+    <script src="{{ asset('js/jquery.timer.js') }}"></script>
+    <script src="{{ asset('js/jquery.imgpreload.js') }}"></script>
 <!-- 
     <script src="{{ asset('js/jquery.mobile.custom.min.js') }}"></script>
  -->

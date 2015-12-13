@@ -13,13 +13,46 @@
 
 @section('body')
 
+    <div class="progress-wrapper">
+      <div class="progress-inner">
+        <div class="progress ">
+          <div id="page_progress_bar" class="progress-bar progress-bar-info progress-bar-striped" 
+            role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 1%;min-width: 2em;">
+            1%
+          </div>
+        </div>
+      </div>
+    </div>
+    <style type="text/css">
+      .progress-wrapper {
+        /*遮挡背景*/
+        position:fixed;
+        left: 0px;
+        top: 0px;
+        z-index: 1000;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(245, 245, 213); 
+      }
+      .progress-inner {
+        /*垂直居中*/
+        height: 100%;
+        bottom: 50%;
+        -webkit-transform: translateY(50%);
+           -moz-transform: translateY(50%);
+            -ms-transform: translateY(50%);
+             -o-transform: translateY(50%);
+                transform: translateY(50%);
+      }
+    </style>
+
     <div class="site-background site-background-front" 
-      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_backgrounds'][rand(0, count($param['random_backgrounds'])-1)] }}?width=800&height=800)"></div>
+      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_background'] }})"></div>
     <div class="site-background site-background-back"
       style=""></div>
 
     <div class="cover-continer" >
-
           <div class="cover-inner" onclick="shuffleBackground();" >
             <h1 class="cover-heading">见证爱情</h1>
             <p class="lead">二十年擦肩而过</p>
@@ -133,14 +166,11 @@
                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                 <span class="sr-only">Previous</span>
             </a>
-            
             <a class="picplayer-control-next" onclick="showPictureWallNext(event);">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
-
         </div>
-
     </div>
 
 @stop
@@ -165,6 +195,8 @@ function img_transform_scale(scale_now) {
 var picture_wall = new PictureWall();
 
 $(function(){
+  // 初始进度条
+  initProcessBar();
 
   // // 初始化北京，逐渐放大
   // initBackground();
@@ -223,8 +255,50 @@ $(function(){
 });
 
 // 保证每次更换的背景不重复
-var random_backgrounds_bak = {{ json_encode(array_values($param['random_backgrounds'])) }};
+var random_backgrounds_bak = {{ json_encode(array_values($param['backgrounds'])) }};
 var random_backgrounds = $.extend(true, [], random_backgrounds_bak);
+
+/**
+ * @brief 加载图片的进度条
+ */
+function initProcessBar() {
+    var image_index = 0;
+    var images = [];
+    images.push("{{ URL::to('/get-background') }}/{{ $param['random_background'] }}");
+    for (var i = 0; i < document.images.length; i++) {
+        images.push(document.images[i].src);
+    }
+    // just for test. TODO
+    @foreach( $param['backgrounds'] as $image_bg)
+      // images.push("{{ URL::to('/get-background') }}/{{ $image_bg }}");  
+    @endforeach
+
+    var page_progress_bar = $('#page_progress_bar');
+
+    /*预加载图片*/
+    $.imgpreload(images,
+    {
+        each: function () {
+            /*this will be called after each image loaded*/
+            // var status = $(this).data('loaded') ? 'success' : 'error';
+            // if (status == "success") {
+                var v = (parseFloat(++image_index) / images.length).toFixed(2);
+                var percent = Math.round(v * 100);
+                // console.log('percent:' + percent);
+                page_progress_bar.width(percent+'%');
+                page_progress_bar.text(percent+'%');
+            // }
+        },
+        all: function () {
+            /*this will be called after all images loaded*/
+            // console.log('completed');
+            var percent = 100;
+            page_progress_bar.width(percent+'%');
+            page_progress_bar.text(percent+'%');
+            page_progress_bar.closest('div.progress-wrapper').fadeOut(1000);// 1秒内淡出
+        }
+    });
+}
 
 /**
  * @brief 随机更换背景
