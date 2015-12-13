@@ -47,13 +47,11 @@
       }
     </style>
 
-    <div class="site-background site-background-front" 
-      style="background-image:url({{ URL::to('/get-background') }}/{{ $param['random_background'] }})"></div>
-    <div class="site-background site-background-back"
-      style=""></div>
+    <div class="site-background site-background-front" ></div>
+    <div class="site-background site-background-back"  ></div>
 
     <div class="cover-continer" >
-          <div class="cover-inner" onclick="shuffleBackground();" >
+          <div class="cover-inner" onclick="doShuffleBackground();" >
             <h1 class="cover-heading">见证爱情</h1>
             <p class="lead">二十年擦肩而过</p>
             <p class="lead">五年朝夕相伴</p>
@@ -180,26 +178,15 @@
 
 <script type="text/javascript">
 
-function img_transform_scale(scale_now) {
-  var css = {
-          // 'text-indent': scale_now,
-    '-webkit-transform': "scale(" + scale_now + ", " + scale_now + ")",
-       '-moz-transform': "scale(" + scale_now + ", " + scale_now + ")",
-        '-ms-transform': "scale(" + scale_now + ", " + scale_now + ")",
-         '-o-transform': "scale(" + scale_now + ", " + scale_now + ")",
-            'transform': "scale(" + scale_now + ", " + scale_now + ")"
-  };
-  return css;
-};
-
 var picture_wall = new PictureWall();
 
 $(function(){
+
+  // 初始化背景
+  initBackground();
+
   // 初始进度条
   initProcessBar();
-
-  // // 初始化北京，逐渐放大
-  // initBackground();
 
   // // 相册图片出现时，渐显效果
   // $('.timeline-body').appear();
@@ -254,51 +241,12 @@ $(function(){
 
 });
 
+
 // 保证每次更换的背景不重复
 var random_backgrounds_bak = {{ json_encode(array_values($param['backgrounds'])) }};
 var random_backgrounds = $.extend(true, [], random_backgrounds_bak);
-
-/**
- * @brief 加载图片的进度条
- */
-function initProcessBar() {
-    var image_index = 0;
-    var images = [];
-    images.push("{{ URL::to('/get-background') }}/{{ $param['random_background'] }}");
-    for (var i = 0; i < document.images.length; i++) {
-        images.push(document.images[i].src);
-    }
-    // just for test. TODO
-    @foreach( $param['backgrounds'] as $image_bg)
-      // images.push("{{ URL::to('/get-background') }}/{{ $image_bg }}");  
-    @endforeach
-
-    var page_progress_bar = $('#page_progress_bar');
-
-    /*预加载图片*/
-    $.imgpreload(images,
-    {
-        each: function () {
-            /*this will be called after each image loaded*/
-            // var status = $(this).data('loaded') ? 'success' : 'error';
-            // if (status == "success") {
-                var v = (parseFloat(++image_index) / images.length).toFixed(2);
-                var percent = Math.round(v * 100);
-                // console.log('percent:' + percent);
-                page_progress_bar.width(percent+'%');
-                page_progress_bar.text(percent+'%');
-            // }
-        },
-        all: function () {
-            /*this will be called after all images loaded*/
-            // console.log('completed');
-            var percent = 100;
-            page_progress_bar.width(percent+'%');
-            page_progress_bar.text(percent+'%');
-            page_progress_bar.closest('div.progress-wrapper').fadeOut(1000);// 1秒内淡出
-        }
-    });
-}
+var random_background_next_url = "";
+var random_background_current_url = "";
 
 /**
  * @brief 随机更换背景
@@ -309,26 +257,31 @@ function initBackground() {
     .css(img_transform_scale(scale_now))
     .css('text-indent', scale_now);
 
-  $.timer(function() {
-    var background_front = $('div.site-background-front');
-    background_front.animate({textIndent: 1.2}, {
-      duration: 20*1000, 
-      step: function(scale_now, fx) {
-        $(this).css(img_transform_scale(scale_now));
-      }
-    });
-  }).once(0);
+  shuffleBackground();
+  shuffleBackground();
+  var background_front = $('div.site-background-front');
+  background_front.css("background-image", 'url( ' + random_background_current_url  + ' )');
 
+  // 取消自动开始放大的效果
+  // $.timer(function() {
+  //   var background_front = $('div.site-background-front');
+  //   background_front.animate({textIndent: 1.2}, {
+  //     duration: 20*1000, 
+  //     step: function(scale_now, fx) {
+  //       $(this).css(img_transform_scale(scale_now));
+  //     }
+  //   });
+  // }).once(0);
 }
 function shuffleBackground() {
   // console.debug("shuffleBackground()");
-
   var max_num = random_backgrounds.length;
   var shuffleNum = function() { 
     return Math.floor(Math.random()*max_num); // 0 - max_num 间的随机数
   };
+  random_background_current_url = random_background_next_url;
   var index = shuffleNum();
-  var image_url = '{{ URL::to("/get-background") }}/' + random_backgrounds[index] + '?width=' + $(window).width() + '&height=' + $(window).height();
+  random_background_next_url = '{{ URL::to("/get-background") }}/' + random_backgrounds[index] + '?width=' + $(window).width() + '&height=' + $(window).height();
 
   if (1 >= random_backgrounds.length) {
     random_backgrounds = $.extend(true, [], random_backgrounds_bak);
@@ -336,12 +289,21 @@ function shuffleBackground() {
   else {
     random_backgrounds.splice(index,1);
   }
+  // console.log('current=', random_background_current_url);
+  // console.log('next=', random_background_next_url);
+}
+function doShuffleBackground() {
+  shuffleBackground();
 
   var background_front = $('div.site-background-front');
   var background_back  = $('div.site-background-back');
 
+  // 预加载下一张图片
+  $('<img/>').attr('src', random_background_next_url).on('load', function() {
+    $(this).remove(); // prevent memory leaks as @benweet suggested
+  });
   // 在image下载完毕后再执行图片切换效果
-  $('<img/>').attr('src', image_url).on('load', function() {
+  $('<img/>').attr('src', random_background_current_url).on('load', function() {
     // console.debug('image load completed.');
     // console.debug('index=' + index);
 
@@ -350,13 +312,13 @@ function shuffleBackground() {
     background_front.stop();
     background_back.stop();
 
-    background_back.css("background-image", 'url( ' + image_url  + ' )')
+    background_back.css("background-image", 'url( ' + random_background_current_url  + ' )');
     background_back.css({opacity: 0});
 
     // 缩小当前图像
     background_front.animate({textIndent: 1}, {
       queue: false,
-      duration: 800, 
+      duration: 800, // 0.8 s
       step: function(scale_now,fx) {
         $(this).css(img_transform_scale(scale_now));
       },
@@ -394,6 +356,68 @@ function shuffleBackground() {
     });
 
   });
+}
+function img_transform_scale(scale_now) {
+  var css = {
+          // 'text-indent': scale_now,
+    '-webkit-transform': "scale(" + scale_now + ", " + scale_now + ")",
+       '-moz-transform': "scale(" + scale_now + ", " + scale_now + ")",
+        '-ms-transform': "scale(" + scale_now + ", " + scale_now + ")",
+         '-o-transform': "scale(" + scale_now + ", " + scale_now + ")",
+            'transform': "scale(" + scale_now + ", " + scale_now + ")"
+  };
+  return css;
+};
+
+/**
+ * @brief 加载图片的进度条
+ */
+function initProcessBar() {
+    var image_index = 0;
+    var images = [];
+
+    images.push(random_background_current_url);
+    images.push(random_background_next_url);
+    for (var i = 0; i < document.images.length; i++) {
+        images.push(document.images[i].src);
+    }
+
+    // just for test. TODO
+    @foreach( $param['backgrounds'] as $image_bg)
+      // images.push(
+      //     "{{ URL::to('/get-background') }}/{{ $image_bg }}" 
+      //     + '?width='  + $(window).width() 
+      //     + '&height=' + $(window).height()
+      //   );
+    @endforeach
+
+    // console.log(images);
+
+    var page_progress_bar = $('#page_progress_bar');
+
+    /*预加载图片*/
+    $.imgpreload(images,
+    {
+        each: function () {
+            /*this will be called after each image loaded*/
+            // var status = $(this).data('loaded') ? 'success' : 'error';
+            // if (status == "success") {
+                var v = (parseFloat(++image_index) / images.length).toFixed(2);
+                var percent = Math.round(v * 100);
+                // console.log('percent:' + percent);
+                page_progress_bar.width(percent+'%');
+                page_progress_bar.text(percent+'%');
+            // }
+        },
+        all: function () {
+            /*this will be called after all images loaded*/
+            // console.log('completed');
+            var percent = 100;
+            page_progress_bar.width(percent+'%');
+            page_progress_bar.text(percent+'%');
+            page_progress_bar.closest('div.progress-wrapper').fadeOut(1000);// 1秒内淡出
+        }
+    });
 }
 
 
