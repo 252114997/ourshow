@@ -46,16 +46,16 @@
 	@yield('js')
 
     <script type="text/javascript">
-        console.log("Power by %cWS&TT","color:red");
-        console.log('Contact 252114997#qq.com');
-        console.log('');
         console.log('╱╱╱╱╱╱╱╱╱╭━━━━┳━━━━╮');
         console.log('╱╱╱╱╱╱╱╱╱┃╭╮╭╮┃╭╮╭╮┃');
         console.log('╭╮╭╮╭┳━━╮╰╯┃┃╰┻╯┃┃╰╯');
         console.log('┃╰╯╰╯┃━━┫╱╱┃┃╱╱╱┃┃');
         console.log('╰╮╭╮╭╋━━┃╱╱┃┃╱╱╱┃┃');
         console.log('╱╰╯╰╯╰━━╯╱╱╰╯╱╱╱╰╯');
-        console.log('@ 2015.12.12');
+        console.log('');
+        console.log('make it @ 2015.12.12');
+        console.log("Power by %cWS&TT","color:red");
+        console.log('Contact 252114997#qq.com');
     </script>
 </body>
 </html>

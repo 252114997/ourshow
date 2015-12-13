@@ -81,6 +81,7 @@
 @section('js')
 
 <script type="text/javascript">
+  $('#inputToken').focus();
 </script>
 
 @stop

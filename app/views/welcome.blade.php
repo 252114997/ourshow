@@ -137,7 +137,7 @@
     </div>
 
 
-    <div id="picture_player" class="picplayer plcplayer-animate-start">
+    <div id="picture_player" tabindex="0" class="picplayer plcplayer-animate-start">
         <div class="picplayer-content" onclick="showOrHidePlayerControl(this);">
             <div class="picplayer-canvas" >
                 <div class="item" >
@@ -720,6 +720,33 @@ PictureWall.prototype.bindTouchEvent = function() {
   var this_ptr = this;
   var pic_list = this._element_picture_list;
 
+  var this_ptr = this;
+
+  $(this._element_parent_div).keyup(function(e){
+      // console.log('keycode=' + e.keyCode);
+      if (this_ptr.isHide()) {
+        return;
+      }
+
+      // 37 - left
+      // 39 - right
+      // 74 - j
+      // 75 - k
+      // 27 - esc
+      if (37 == e.keyCode || 75 == e.keyCode) {
+        this_ptr.last(0.2);
+        return false;
+      }
+      else if (39 == e.keyCode || 74 == e.keyCode) {
+        this_ptr.next(0.2);
+        return false;
+      }
+      else if (27 == e.keyCode) {
+        this_ptr.hide();
+        return false;
+      }
+  });
+
   $.ontouchevent(this._element_parent_div, function(evt, dir, phase, swipetype, distance){
     var tag_name = ($(evt.target).prop("tagName")).toLowerCase();
     if (tag_name !== 'li' && tag_name !== 'img' ) {
@@ -827,6 +854,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
         // console.debug("get-pictures ok! ablum_id=" + ablum_id);
         if (data.data.rows.length > 0) {
           this_ptr.reloadPictureList(data.data.rows, ablum_title);
+          this_ptr._element_parent_div.focus(); // to handle keyup event for left/right/J/K/Esc
         }
         else {
           this_ptr.hide();
@@ -916,6 +944,9 @@ PictureWall.prototype.hide = function () {
   this._element_parent_div.removeClass('plcplayer-animate-end');
 }
 
+PictureWall.prototype.isHide = function () {
+  return !this._element_parent_div.hasClass('plcplayer-animate-end');
+}
 
 /**
  * @brief 获取当前照片索引，返回 null 表示获取失败
@@ -947,6 +978,8 @@ PictureWall.prototype.getLastPictureIndex = function () {
 
 /**
  * @brief 执行切换照片的操作
+ * rate 数值越小，图片移动速度越快,
+ * 建议最大设置为0.7，以保证翻页不会太慢
  */
 PictureWall.prototype.next = function (rate) {
   // console.debug("next()");
