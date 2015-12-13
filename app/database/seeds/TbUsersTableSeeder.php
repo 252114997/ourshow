@@ -14,35 +14,35 @@ class TbUsersTableSeeder extends Seeder {
 		\DB::table('tb_users')->insert(array (
 			0 => 
 			array (
-				'id' => 1,
-				'username' => '王一',
+				'id' => 'wanger',
+				'username' => '王二',
 				'licence_count' => 0,
-				'created_at' => NULL,
-				'updated_at' => NULL,
+				'created_at' => '0000-00-00 00:00:00',
+				'updated_at' => '0000-00-00 00:00:00',
 			),
 			1 => 
 			array (
-				'id' => 2,
-				'username' => '王二',
+				'id' => 'wangyi',
+				'username' => '王一',
 				'licence_count' => 0,
-				'created_at' => NULL,
-				'updated_at' => NULL,
+				'created_at' => '0000-00-00 00:00:00',
+				'updated_at' => '2015-12-13 21:32:38',
 			),
 			2 => 
 			array (
-				'id' => 3,
-				'username' => '翟一',
+				'id' => 'zhaier',
+				'username' => '翟二',
 				'licence_count' => 0,
-				'created_at' => NULL,
-				'updated_at' => NULL,
+				'created_at' => '0000-00-00 00:00:00',
+				'updated_at' => '0000-00-00 00:00:00',
 			),
 			3 => 
 			array (
-				'id' => 4,
-				'username' => '翟二',
+				'id' => 'zhaiyi',
+				'username' => '翟一',
 				'licence_count' => 0,
-				'created_at' => NULL,
-				'updated_at' => NULL,
+				'created_at' => '0000-00-00 00:00:00',
+				'updated_at' => '0000-00-00 00:00:00',
 			),
 		));
 	}

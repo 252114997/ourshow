@@ -34,7 +34,7 @@ class UserAuthController extends Controller {
 				->where('token', $token)
 				->first();
 			if (null == $user_token_info) {
-				return '邀请码不对啊喂，仔细核对一下短信';
+				return '啊...邀请码不对，请仔细核对一下';
 			}
 
 			tb_user_token::where('user_id', $user_id)

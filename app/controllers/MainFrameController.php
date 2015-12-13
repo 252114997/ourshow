@@ -118,7 +118,12 @@ class MainFrameController extends BaseController {
 			->toArray();
 
 		foreach ($items as $key => &$value) {
-			$value['picture_id'] = tb_pictures::find($value['picture_id'])->toArray();
+			$picture_of_ablum = tb_pictures::find($value['picture_id']);
+			if (null == $picture_of_ablum) {
+				Log::error('Not found picture for id='.$value['picture_id']);
+				continue;
+			}
+			$value['picture_id'] = $picture_of_ablum->toArray();
 			$value['likes'] = self::getLikesOfAblum($value['id']);
 			$value['likeit'] = self::isLikeIt($value['id'], $user_id);
 			// $value['comments'] = self::getCommentsOfAblum($value['id'], 1, 10); // TODO 分页
@@ -268,7 +273,12 @@ class MainFrameController extends BaseController {
 			->toArray();
 
 		foreach ($items as $key => &$value) {
-			$value['user_id'] = tb_users::find($value['user_id'])->toArray();
+			$user_of_post = tb_users::find($value['user_id']);
+			if (null == $user_of_post) {
+				Log::error('Not found user for id='.$value['user_id']);
+				continue;
+			}
+			$value['user_id'] = $user_of_post->toArray();
 
 			$updated_at = new DateTime($value['updated_at']);
 			$now = new DateTime();

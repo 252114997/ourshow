@@ -14,11 +14,11 @@ class TbLikeTableSeeder extends Seeder {
 		\DB::table('tb_like')->insert(array (
 			0 => 
 			array (
-				'id' => 22,
-				'ablum_id' => 3,
-				'user_id' => 1,
-				'created_at' => '2015-06-06 21:57:09',
-				'updated_at' => '2015-06-06 21:57:09',
+				'id' => 23,
+				'ablum_id' => 1,
+				'user_id' => 'wangyi',
+				'created_at' => '2015-12-13 21:24:08',
+				'updated_at' => '2015-12-13 21:24:08',
 			),
 		));
 	}

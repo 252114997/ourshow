@@ -16,7 +16,7 @@ class CreateTbPostsTable extends Migration {
 		{
 			$table->integer('id', true);
 			$table->integer('ablum_id')->nullable();
-			$table->integer('user_id')->nullable();
+			$table->string('user_id')->nullable();
 			$table->string('text')->nullable();
 			$table->timestamps();
 		});

@@ -14,7 +14,8 @@ class CreateTbUserTokenTable extends Migration {
 	{
 		Schema::create('tb_user_token', function(Blueprint $table)
 		{
-			$table->integer('user_id')->nullable();
+			// $table->integer('user_id')->nullable();
+			$table->string('user_id')->nullable();
 			$table->string('token')->nullable();
 			$table->timestamps();
 			$table->boolean('used')->nullable();

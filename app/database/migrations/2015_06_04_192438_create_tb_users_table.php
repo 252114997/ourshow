@@ -14,7 +14,8 @@ class CreateTbUsersTable extends Migration {
 	{
 		Schema::create('tb_users', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+			// $table->integer('id', true);
+			$table->string('id')->primary();
 			$table->string('username')->nullable();
 			$table->integer('licence_count')->default(0); // 许可次数，指定次数内，可以免输入 邀请码
 			$table->timestamps();
