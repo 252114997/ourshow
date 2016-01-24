@@ -634,7 +634,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
   this._element_picture_list.find('img').attr('src', 'img/ajax-loader.gif');
 
   this.hidePlayerControl();
-  this._element_parent_div.addClass('plcplayer-animate-end');
+  this._element_parent_div.addClass('picplayer-animate-end');
 
   $.get(
     '{{ URL::to("/get-pictures") }}' + '/' + ablum_id,           // URL
@@ -730,7 +730,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
  * @brief 隐藏照片墙
  */
 PictureWall.prototype.hide = function () {
-  this._element_parent_div.removeClass('plcplayer-animate-end');
+  this._element_parent_div.removeClass('picplayer-animate-end');
 }
 
 
