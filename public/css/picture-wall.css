@@ -125,6 +125,39 @@
   text-shadow: 1px 1px 30px rgba(0,0,0,1);
 }
 
+.picplayer-control-comments {
+  z-index: 102;
+  position: absolute;
+  padding: 10px;
+
+  right: -40%;
+  width: 40%;
+  height: 100%;
+
+/*  border-bottom: 1px solid #343536;
+  background: #111;*/
+  background-color: rgba(0,0,0, 0.8);
+
+  -webkit-transition: all 0.2s ease;
+     -moz-transition: all 0.2s ease;
+      -ms-transition: all 0.2s ease;
+       -o-transition: all 0.2s ease;
+          transition: all 0.2s ease;
+}
+
+.picplayer-control-comments-show {
+  right: 0px;
+}
+
+.picplayer-control-comments > .comments-button {
+  z-index: 102;
+  position: absolute;
+  margin-top: 10px;
+  height: 20px;
+  width: 50px;
+  top: 0px;
+  left: -53px;
+}
 
 /**
  * @brief 画布

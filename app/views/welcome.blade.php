@@ -168,6 +168,28 @@
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
+            <div class="picplayer-control-comments">
+                <div class="text-center">
+                  <div class="input-group">
+                      <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
+                        onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
+                      <span class="input-group-btn" onclick="addComments();">     
+                        <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
+                      </span>
+                  </div>
+
+                  <hr/>
+                  <ul class="ourshow-commmentlist"  data-options="url:''" ></ul>
+
+                </div>
+
+                <div class="comments-button">
+                  <a class="btn btn-xs btn-default" 
+                      data-toggle="tooltip" data-placement="top" 
+                      onclick='toggleCommentsButtonInPicplayer(this); return false;' 
+                    ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -468,13 +490,22 @@ function likeAblum (button, ablum_id) {
 
 function toggleButtons(button) {
   // console.debug('toggleButtons');
-
   button = $(button);
   var comment = button.closest('li').find('.usercomment');
   var timeline_panel = button.closest('.timeline-panel');
   comment.toggle();
   button.toggleClass('active');
   timeline_panel.toggleClass('black-background');
+  return false;
+}
+
+function toggleCommentsButtonInPicplayer(button) {
+  // console.debug('toggleCommentsButtonInPicplayer');
+  button = $(button);
+  var comment = button.closest('.picplayer-control-comments');
+  comment.toggleClass('picplayer-control-comments-show');
+  button.toggleClass('active');
+
   return false;
 }
 
@@ -525,6 +556,12 @@ function reloadComment(commmentlist) {
   // commmentlist.html('');
   var data_options = eval('({' + commmentlist.attr('data-options') + '})');
   var request_url = data_options.url;
+
+  if ('' == request_url) {
+    // console.log('request_url is empty!');
+    return;
+  }
+
   if (data_options.pageNumber && data_options.pageSize) {
     request_url += '?' + $.param({ page:data_options.pageNumber, rows:data_options.pageSize});
   }
@@ -593,6 +630,9 @@ function reloadComment(commmentlist) {
   );
 }
 
+function addComments() {
+  picture_wall.addComments();
+}
 
 /**
  * @brief 照片墙功能的事件响应函数
@@ -701,6 +741,8 @@ function PictureWall() {
   var picture_info = parent_div.find('.picplayer-content > .picplayer-canvas > .item > .info');
   var ablum_title = parent_div.find('.picplayer-content > .picplayer-control-header > .picplayer-control-title');
   var ablum_header = parent_div.find('.picplayer-content > .picplayer-control-header');
+  var commmentlist = parent_div.find('.picplayer-content > .picplayer-control-comments .ourshow-commmentlist');
+  var comment_input = parent_div.find('.picplayer-content > .picplayer-control-comments .input-group input');
 
   this._element_parent_div = parent_div;
   this._element_player_control_last = player_control_last;
@@ -710,6 +752,8 @@ function PictureWall() {
   this._element_picture_info = picture_info;
   this._element_ablum_title = ablum_title;
   this._element_ablum_header = ablum_header;
+  this._element_commmentlist = commmentlist;
+  this._element_comment_input = comment_input;
 
   this._picture_array = [];
   this._picture_info_array = [];
@@ -879,6 +923,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
         if (data.data.rows.length > 0) {
           this_ptr.reloadPictureList(data.data.rows, ablum_title);
           this_ptr._element_parent_div.focus(); // to handle keyup event for left/right/J/K/Esc
+          this_ptr.reloadComments();
         }
         else {
           this_ptr.hide();
@@ -960,6 +1005,47 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   this.showOrHideLastNextButton();
   // console.log("reloadPictureList() 3");
 }
+
+/**
+ * @brief 初始化评论列表
+ */
+ PictureWall.prototype.reloadComments = function () {
+  var ablum_id = this._ablum_id;
+  var commmentlist = this._element_commmentlist;
+  var data_options = eval('({' + commmentlist.attr('data-options') + '})');
+  data_options.url = '{{ URL::to("/get-comments") }}/' + ablum_id;
+
+  var data_options_string = JSON.stringify(data_options);
+  data_options_string = $.ltrim(data_options_string, '{');
+  data_options_string = $.rtrim(data_options_string, '}');
+
+  commmentlist.attr('data-options', data_options_string);
+  reloadComment(commmentlist);
+ }
+
+ PictureWall.prototype.addComments = function () {
+  var this_ptr = this;
+  var ablum_id = this._ablum_id;
+  var comment_input = this._element_comment_input;
+  var comment = comment_input.val();
+  comment_input.focus();
+
+  $.post(
+    '{{ URL::to("/add-comments") }}' + '/' + ablum_id,   // URL
+    JSON.stringify({ comment : comment }), // data
+    function(data) {
+      if (1 != data.status) {
+        // 失败
+        // $().alert('close'); // test TODO
+        return;
+      }
+      comment_input.val('');
+      this_ptr.reloadComments();
+    },     // callback
+    "json" // data type
+  );
+  return true;
+ }
 
 /**
  * @brief 隐藏照片墙
