@@ -169,7 +169,7 @@
                 <span class="sr-only">Next</span>
             </a>
             <div class="picplayer-control-comments">
-                <div class="text-center">
+                <div class="text-center picplayer-control-commmentlist-wrap">
                   <div class="input-group">
                       <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
                         onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
@@ -179,8 +179,13 @@
                   </div>
 
                   <hr/>
-                  <ul class="ourshow-commmentlist"  data-options="url:''" ></ul>
-
+                  <div style="padding-bottom: 100px;">
+                    <ul class="ourshow-commmentlist"  data-options="url:''" ></ul>
+                    <a class="btn btn-xs btn-default" 
+                      data-toggle="tooltip" data-placement="top" 
+                      onclick='loadCommentMore();' 
+                    ><i class="glyphicon glyphicon-refresh" ></i> 加载更多</a>
+                  </div>
                 </div>
 
                 <div class="comments-button">
@@ -634,6 +639,10 @@ function addComments() {
   picture_wall.addComments();
 }
 
+function loadCommentMore() {
+  picture_wall.loadCommentMore();
+}
+
 /**
  * @brief 照片墙功能的事件响应函数
  */
@@ -1014,13 +1023,17 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   var commmentlist = this._element_commmentlist;
   var data_options = eval('({' + commmentlist.attr('data-options') + '})');
   data_options.url = '{{ URL::to("/get-comments") }}/' + ablum_id;
+  data_options.pageNumber = null;
+  data_options.pageSize = null;
 
   var data_options_string = JSON.stringify(data_options);
   data_options_string = $.ltrim(data_options_string, '{');
   data_options_string = $.rtrim(data_options_string, '}');
 
   commmentlist.attr('data-options', data_options_string);
-  reloadComment(commmentlist);
+  commmentlist.html('');
+
+  this.loadCommentMore();
  }
 
  PictureWall.prototype.addComments = function () {
@@ -1045,7 +1058,66 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
     "json" // data type
   );
   return true;
- }
+}
+
+PictureWall.prototype.loadCommentMore = function () {
+  var commmentlist = this._element_commmentlist;
+  var data_options = eval('({' + commmentlist.attr('data-options') + '})');
+  var request_url = data_options.url;
+
+  if ('' == request_url) {
+    // console.log('request_url is empty!');
+    return;
+  }
+
+  if (data_options.pageNumber && data_options.pageSize) {
+    request_url += '?' + $.param({ page:data_options.pageNumber, rows:data_options.pageSize});
+  }
+  $.get(
+    request_url,   // URL
+    function(data) {
+      if (1 != data.status) {
+        // fail
+        return;
+      }
+      if (data.data.rows.length <= 0) {
+        // no more data
+        return;
+      }
+      // success
+
+      // 加载评论
+      for (var index in data.data.rows) {
+        var comment = data.data.rows[index];
+        commmentlist.addClass('list-unstyled').addClass('text-left');
+        commmentlist.append($('<strong>').addClass('pull-left').html(comment['user_id']['username']));
+        commmentlist.append(
+          $('<small/>').addClass('pull-right').addClass('text-muted')
+            .append($('<span/>').addClass('glyphicon').addClass('glyphicon-time'))
+            .append(comment['updated_at']+' 前')
+        );
+        commmentlist.append('<br/>');
+        commmentlist.append($('<li/>').html(comment['text']));
+        commmentlist.append('<br/>');
+        // console.debug(commmentlist.html());
+      }
+
+      // 更新下一次加载的页数
+      var page_number = data_options.pageNumber || 1;
+      var page_size = data_options.pageSize || 6;
+      var page_sum = Math.floor((page_size+data.data.count-1)  / page_size); // 计算页面总数。
+
+      data_options.pageNumber = page_number + 1;
+      data_options.pageSize = page_size;
+      var data_options_string = JSON.stringify(data_options);
+      data_options_string = $.ltrim(data_options_string, '{');
+      data_options_string = $.rtrim(data_options_string, '}');
+      commmentlist.attr('data-options', data_options_string);
+
+    }// callback
+  );
+}
+
 
 /**
  * @brief 隐藏照片墙
