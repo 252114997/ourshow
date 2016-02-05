@@ -168,33 +168,34 @@
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
-            <div class="picplayer-control-comments">
-                <div class="text-center picplayer-control-commmentlist-wrap">
-                  <div class="input-group">
-                      <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
-                        onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
-                      <span class="input-group-btn" onclick="addComments();">     
-                        <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
-                      </span>
-                  </div>
-
-                  <hr/>
-                  <div style="padding-bottom: 100px;">
-                    <ul class="ourshow-commmentlist"  data-options="url:''" ></ul>
-                    <a class="btn btn-xs btn-default" 
-                      data-toggle="tooltip" data-placement="top" 
-                      onclick='loadCommentMore();' 
-                    ><i class="glyphicon glyphicon-refresh" ></i> 加载更多</a>
-                  </div>
+            <div class="picplayer-control-comments" >
+              <div class="text-center picplayer-control-commmentlist-wrap">
+                <div class="input-group">
+                    <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
+                      onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
+                    <span class="input-group-btn" onclick="addComments();">
+                      <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
+                    </span>
                 </div>
 
-                <div class="comments-button">
+                <hr/>
+                <div style="padding-bottom: 100px;">
+                  <ul class="ourshow-commmentlist"  data-options="url:''" ></ul>
                   <a class="btn btn-xs btn-default" 
-                      data-toggle="tooltip" data-placement="top" 
-                      onclick='toggleCommentsButtonInPicplayer(this); return false;' 
-                    ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
+                    data-toggle="tooltip" data-placement="top"
+                    onclick='loadCommentMore();'
+                  ><i class="glyphicon glyphicon-refresh" ></i> 加载更多</a>
                 </div>
+              </div>
+
+              <div class="comments-button">
+                <a class="btn btn-xs btn-default"
+                    data-toggle="tooltip" data-placement="top"
+                    onclick='toggleCommentsButtonInPicplayer(this); return false;'
+                  ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
+              </div>
             </div>
+
         </div>
     </div>
 
@@ -504,16 +505,6 @@ function toggleButtons(button) {
   return false;
 }
 
-function toggleCommentsButtonInPicplayer(button) {
-  // console.debug('toggleCommentsButtonInPicplayer');
-  button = $(button);
-  var comment = button.closest('.picplayer-control-comments');
-  comment.toggleClass('picplayer-control-comments-show');
-  button.toggleClass('active');
-
-  return false;
-}
-
 /**
  * @brief 实现评论功能
  */
@@ -643,6 +634,16 @@ function loadCommentMore() {
   picture_wall.loadCommentMore();
 }
 
+function toggleCommentsButtonInPicplayer(button) {
+  // console.debug('toggleCommentsButtonInPicplayer');
+  button = $(button);
+  button.toggleClass('active');
+
+  picture_wall.toggleComments();
+  return false;
+}
+
+
 /**
  * @brief 照片墙功能的事件响应函数
  */
@@ -742,6 +743,7 @@ function img_no_animations() {
  * @brief 实现照片墙功能的 js 类
  */
 function PictureWall() {
+  var other_divs = $('body > div').not('[id="picture_player"]').not('[class="progress-wrapper"]');
   var parent_div = $('#picture_player');
   var player_control_last = parent_div.find('.picplayer-content > .picplayer-control-last');
   var player_control_next = parent_div.find('.picplayer-content > .picplayer-control-next');
@@ -750,9 +752,12 @@ function PictureWall() {
   var picture_info = parent_div.find('.picplayer-content > .picplayer-canvas > .item > .info');
   var ablum_title = parent_div.find('.picplayer-content > .picplayer-control-header > .picplayer-control-title');
   var ablum_header = parent_div.find('.picplayer-content > .picplayer-control-header');
+  var comments = parent_div.find('.picplayer-content > .picplayer-control-comments');
+
   var commmentlist = parent_div.find('.picplayer-content > .picplayer-control-comments .ourshow-commmentlist');
   var comment_input = parent_div.find('.picplayer-content > .picplayer-control-comments .input-group input');
 
+  this._element_other_divs = other_divs;
   this._element_parent_div = parent_div;
   this._element_player_control_last = player_control_last;
   this._element_player_control_next = player_control_next;
@@ -761,14 +766,15 @@ function PictureWall() {
   this._element_picture_info = picture_info;
   this._element_ablum_title = ablum_title;
   this._element_ablum_header = ablum_header;
+  this._element_comments = comments;
   this._element_commmentlist = commmentlist;
   this._element_comment_input = comment_input;
 
   this._picture_array = [];
   this._picture_info_array = [];
   this._picture_index = 0;
-  var this_ptr = this;
 
+  var this_ptr = this;
   var timer_ptr = $.timer(
     function() {
       // console.debug(new Date().toLocaleString() + ' ontimer timer_ptr');
@@ -797,7 +803,22 @@ PictureWall.prototype.bindTouchEvent = function() {
   var this_ptr = this;
   var pic_list = this._element_picture_list;
 
-  var this_ptr = this;
+  // 取消 _element_comments 点击事件冒泡，防止滚动评论时，将事件传递到 picture 中。
+  // 保证 picture 中的图片是静止状态
+  $(this._element_comments).keyup(function(e) {
+    // console.debug("(this._element_comments).keyup");
+    e.stopPropagation();
+  });
+
+  $.ontouchevent(this._element_comments, function(e) {
+    // console.debug("ontouchevent(this._element_comment");
+    e.stopPropagation();
+  });
+
+  this._element_comments.bind('click', function(e) {
+    // console.debug("this._element_comments.bind('click'");
+    e.stopPropagation();
+  });
 
   $(this._element_parent_div).keyup(function(e){
       // console.log('keycode=' + e.keyCode);
@@ -859,6 +880,10 @@ PictureWall.prototype.bindTouchEvent = function() {
         left_img.css(middle_img_pos(distance + this._left_x));
         middle_img.css(middle_img_pos(distance + this._middle_x));
         right_img.css(middle_img_pos(distance + this._right_x));
+      }
+
+      if (!this_ptr.isShowComments()) {
+        return 'preventDefault_ontouchevent_switch';
       }
     }
     else if (phase == 'end'){ // on touchend
@@ -922,6 +947,7 @@ PictureWall.prototype.show = function (ablum_id, ablum_title) {
 
   this.hidePlayerControl();
   this._element_parent_div.addClass('picplayer-animate-end');
+  this._element_other_divs.hide();
 
   $.get(
     '{{ URL::to("/get-pictures") }}' + '/' + ablum_id,           // URL
@@ -1018,7 +1044,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
 /**
  * @brief 初始化评论列表
  */
- PictureWall.prototype.reloadComments = function () {
+PictureWall.prototype.reloadComments = function () {
   var ablum_id = this._ablum_id;
   var commmentlist = this._element_commmentlist;
   var data_options = eval('({' + commmentlist.attr('data-options') + '})');
@@ -1036,7 +1062,7 @@ PictureWall.prototype.reloadPictureList = function (picture_id_array, ablum_titl
   this.loadCommentMore();
  }
 
- PictureWall.prototype.addComments = function () {
+PictureWall.prototype.addComments = function () {
   var this_ptr = this;
   var ablum_id = this._ablum_id;
   var comment_input = this._element_comment_input;
@@ -1118,12 +1144,24 @@ PictureWall.prototype.loadCommentMore = function () {
   );
 }
 
+PictureWall.prototype.toggleComments = function () {
+  var comments = this._element_comments;
+  comments.toggleClass('picplayer-control-comments-show');
+}
+
+PictureWall.prototype.isShowComments = function() {
+  var comments = this._element_comments;
+  return comments.hasClass('picplayer-control-comments-show');
+}
+
 
 /**
  * @brief 隐藏照片墙
  */
 PictureWall.prototype.hide = function () {
+  this._element_other_divs.show();
   this._element_parent_div.removeClass('picplayer-animate-end');
+  window.location = '#ablum_' + this._ablum_id;
 }
 
 PictureWall.prototype.isHide = function () {
@@ -1164,6 +1202,10 @@ PictureWall.prototype.getLastPictureIndex = function () {
  * 建议最大设置为0.7，以保证翻页不会太慢
  */
 PictureWall.prototype.next = function (rate) {
+  if (this.isShowComments()) {
+    return;
+  }
+
   // console.debug("next()");
   rate = (rate>0.7) ? 0.7 : rate; // 切换图片时，图片移动速度稍快些
   var right_index = null;
@@ -1223,6 +1265,10 @@ PictureWall.prototype.next = function (rate) {
 }
 
 PictureWall.prototype.last = function (rate) {
+  if (this.isShowComments()) {
+    return;
+  }
+
   // console.debug("last()");
   rate = (rate>0.7) ? 0.7 : rate; // 切换图片时，图片移动速度稍快些
   var left_index = null;
@@ -1278,6 +1324,10 @@ PictureWall.prototype.last = function (rate) {
 }
 
 PictureWall.prototype.reset = function (rate) {
+  if (this.isShowComments()) {
+    return;
+  }
+
   // console.debug("reset()");
   rate = (rate<0.2) ? 0.2 : rate; // 还原位置时，图片移动速度稍慢些
   var pic_list = this._element_picture_list;
@@ -1411,7 +1461,7 @@ PictureWall.prototype.showOrHideLastNextButton = function () {
 
         // only trigger move left/right event , 因为目前不关注上下移动事件 
         dir = (distX < 0)? 'left' : 'right';
-        handletouch(e, dir, 'move', swipeType, distX); // fire callback function with params dir="left|right", phase="move", swipetype="none" etc
+        var result = handletouch(e, dir, 'move', swipeType, distX); // fire callback function with params dir="left|right", phase="move", swipetype="none" etc
 
         // if (Math.abs(distX) > Math.abs(distY)){ // if distance traveled horizontally is greater than vertically, consider this a horizontal movement
         //     dir = (distX < 0)? 'left' : 'right';
@@ -1421,8 +1471,18 @@ PictureWall.prototype.showOrHideLastNextButton = function () {
         //     dir = (distY < 0)? 'up' : 'down';
         //     handletouch(e, dir, 'move', swipeType, distY); // fire callback function with params dir="up|down", phase="move", swipetype="none" etc
         // }
-        e.preventDefault(); // prevent scrolling when inside DIV
-        // touchmove 事件中必须执行 preventDefault() , 否则ipad safari 中会导致图像失去 transition 中的动画效果。具体原因可能是此事件引发 去除动画效果的代码执行。
+
+        if ('preventDefault_ontouchevent_switch' == result) {
+          e.preventDefault(); // prevent scrolling when inside DIV
+          // touchmove 事件中必须执行 preventDefault() , 否则ipad safari 中会导致图像失去 transition 中的动画效果。具体原因可能是此事件引发 去除动画效果的代码执行。
+          // 
+          // result 值为 preventDefault_ontouchevent_switch 时，取消 ontouchevent 'touchmove' 事件的默认动作
+          // 
+          // 增加此开关是因为照片墙功能中， 评论列表的下拉功能 与 照片墙的照片切换功能 有一些冲突的地方
+          // 开启 preventDefault 会使得 评论列表的下拉功能 失效
+          // 关闭 preventDefault 会使得 照片墙的照片切换功能 有问题（在 ipad safari 中，图像失去 transition 中的动画效果）
+          // 
+        }
       })
       .on('touchend', function(e){
         e = e.originalEvent;

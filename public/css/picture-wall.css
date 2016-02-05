@@ -129,6 +129,10 @@
   height: 100%;
   overflow: auto;
   padding: 10px;
+
+  /*未测试出此 overflow-scrolling 的实际效果，暂时注释掉*/
+  /*-webkit-overflow-scrolling: touch;*/
+          /*overflow-scrolling: touch;*/
 }
 
 .picplayer-control-comments {
@@ -149,12 +153,25 @@
        -o-transition: all 0.2s ease;
           transition: all 0.2s ease;
 
-
 }
 
 .picplayer-control-comments-show {
   right: 0px;
 }
+
+@media (max-width: 767px) {
+  .picplayer-control-comments {
+    left: 100%;
+    right: -100%;
+    width: auto;
+  }
+  .picplayer-control-comments-show {
+    left: 53px;
+    right: 0px;
+    width: auto;
+  }
+}
+
 
 .picplayer-control-comments > .comments-button {
   z-index: 102;
