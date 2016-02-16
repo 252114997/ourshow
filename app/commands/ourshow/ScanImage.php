@@ -63,6 +63,7 @@ class ScanImageCommand extends Command {
 
 	const PATH_SEPERATOR = "\\";
 	public function scanPicture($scandir) {
+		$this->info("");
 		if (!is_dir($scandir)) {
 			$this->info("skip scan {$scandir}[".json_encode(is_dir($scandir))."]");
 			return 0;
@@ -70,6 +71,7 @@ class ScanImageCommand extends Command {
 
 		$count = 0;
 		$scanned_directorys = array_values(array_diff(scandir($scandir), array('..', '.')));
+		$picture_info_array = array();
 		foreach ($scanned_directorys as $key => $filepath) {
 			$filepath = $scandir.self::PATH_SEPERATOR.$filepath;
 			$filepath = str_replace('\\', '/', $filepath);
@@ -81,7 +83,8 @@ class ScanImageCommand extends Command {
 				$this->info("skip not image file! {$filepath} !");
 			}
 			else {
-				$exif_data = exif_read_data($filepath);
+				// ignore  exif_read_data(CIMG0147_副本.jpg): Illegal IFD size: x016C + 2 + x03E8*12 = x304C > x0184
+				$exif_data = @exif_read_data($filepath);
 				if (isset($exif_data['DateTimeOriginal'])) {
 					$datetime_original = DateTime::createFromFormat(
 						'Y:m:d H:i:s', 
@@ -100,23 +103,53 @@ class ScanImageCommand extends Command {
 				$path = substr($filepath, strlen(storage_path()));
 				$caption = "";
 
-				$insert_values = array(
-					// 'id' => $md5,
+				$picture_info_array[] = array(
+					'id' => $md5,
 					'name' => iconv('GBK','utf-8',$title),
 					'path' => iconv('GBK','utf-8',$path),
 					// 'caption' => $caption,
 					'created_at' => $created_at
 				);
-				$picture = tb_pictures::updateOrCreate(
-					array('id' => $md5),
-					$insert_values
-				)->toArray();
-				$this->info("insert pictures: ".$this->grab_dump($picture));
 				$count += 1;
 			}
-			$this->info("");
 		}
 		$this->info("found {$count} pictures in directory {$scandir}!");
+		if (0 == count($picture_info_array)) {
+			return 0;
+		}
+
+		$ablum_info = array(
+			'title' => iconv('GBK','utf-8',basename($scandir)),
+			'tips' => iconv('GBK','utf-8',basename($scandir)),
+			'picture_id' => $picture_info_array[0]['id']
+		);
+		$ablum_info_real = tb_ablums::updateOrCreate(
+			array('title' => $ablum_info['title']),
+			$ablum_info
+		)->toArray();
+		tb_ablum_picture::where('ablum_id', $ablum_info_real['id'])->delete();
+		$this->info("updateOrCreate ablum_info: ".$this->grab_dump($ablum_info));
+		$this->info("updateOrCreate tb_ablums: ".$this->grab_dump($ablum_info_real));
+
+		foreach ($picture_info_array as $picture_info) {
+			$id = $picture_info['id'];
+			unset($picture_info['id']);
+			$picture_info_real = tb_pictures::updateOrCreate(
+				array('id' => $id),
+				$picture_info
+			)->toArray();
+			// $this->info("updateOrCreate tb_pictures: ".$this->grab_dump($picture_info_real));
+
+			$ablum_picture_info_real = tb_ablum_picture::create(
+				array(
+					'ablum_id' => $ablum_info_real['id'],
+					'picture_id' => $picture_info_real['id']
+				)
+			)->toArray();
+			// $this->info("create tb_ablum_picture: ".$this->grab_dump($ablum_picture_info_real));
+		}
+
+		$this->info("");
 		return $count;
 	}
 
