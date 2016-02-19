@@ -61,7 +61,7 @@ class ScanImageCommand extends Command {
 		return ob_get_clean();
 	}
 
-	const PATH_SEPERATOR = "\\";
+	const PATH_SEPERATOR = "/";
 	public function scanPicture($scandir) {
 		$this->info("");
 		if (!is_dir($scandir)) {
@@ -105,8 +105,10 @@ class ScanImageCommand extends Command {
 
 				$picture_info_array[] = array(
 					'id' => $md5,
-					'name' => iconv('GBK','utf-8',$title),
-					'path' => iconv('GBK','utf-8',$path),
+					//'name' => iconv('GBK','utf-8',$title),
+					//'path' => iconv('GBK','utf-8',$path),
+					'name' => $title,
+					'path' => $path,
 					// 'caption' => $caption,
 					'created_at' => $created_at
 				);
@@ -119,8 +121,10 @@ class ScanImageCommand extends Command {
 		}
 
 		$ablum_info = array(
-			'title' => iconv('GBK','utf-8',basename($scandir)),
-			'tips' => iconv('GBK','utf-8',basename($scandir)),
+			//'title' => iconv('GBK','utf-8',basename($scandir)),
+			//'tips' => iconv('GBK','utf-8',basename($scandir)),
+			'title' => basename($scandir),
+			'tips' => basename($scandir),
 			'picture_id' => $picture_info_array[0]['id']
 		);
 		$ablum_info_real = tb_ablums::updateOrCreate(
@@ -133,12 +137,11 @@ class ScanImageCommand extends Command {
 
 		foreach ($picture_info_array as $picture_info) {
 			$id = $picture_info['id'];
-			unset($picture_info['id']);
 			$picture_info_real = tb_pictures::updateOrCreate(
 				array('id' => $id),
 				$picture_info
 			)->toArray();
-			// $this->info("updateOrCreate tb_pictures: ".$this->grab_dump($picture_info_real));
+			$this->info("updateOrCreate tb_pictures: ".$this->grab_dump($picture_info_real));
 
 			$ablum_picture_info_real = tb_ablum_picture::create(
 				array(

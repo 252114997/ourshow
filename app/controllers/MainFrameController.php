@@ -55,7 +55,7 @@ class MainFrameController extends BaseController {
 
 		$param = array();
 		$param['path'] = storage_path().$item['path'];
-		$param['path'] = iconv('utf-8','GBK',$param['path']);
+		//$param['path'] = iconv('utf-8','GBK',$param['path']);
 
 		$param['height'] = intval(Input::get('height', 770));
 		$param['width']  = intval(Input::get('width', 770));
