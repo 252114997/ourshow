@@ -91,18 +91,20 @@
                     </div>
 
                     <div class="buttons">
-                      <a class="btn btn-xs btn-default" 
+                      <a class="btn btn-sm btn-default" 
                           onclick="showPictureWall({{ $ablum['id'] }}, '{{ $ablum['title'] }}');"
                         ><i class="glyphicon glyphicon-blackboard" ></i> 更多</a>
-                      <a class="btn btn-xs {{ $ablum['likeit'] ? 'btn-danger' : 'btn-default' }}" 
+                      <a class="btn btn-sm {{ $ablum['likeit'] ? 'btn-danger' : 'btn-default' }}" 
                           data-toggle="tooltip" data-placement="top" 
                           title="{{ count($ablum['likes']) }} 人表示很赞"
                           onclick='likeAblum(this, {{ $ablum["id"] }}); return false;' 
                         ><i class="glyphicon glyphicon-thumbs-up" ></i> <span>赞({{ count($ablum['likes']) }})</span></a>
-                      <a class="btn btn-xs btn-default" 
+<!-- 
+                      <a class="btn btn-sm btn-default" 
                           data-toggle="tooltip" data-placement="top" 
                           onclick='toggleButtons(this); return false;' 
                         ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
+ -->
                     </div>
                   </div>
 
@@ -189,9 +191,9 @@
               </div>
 
               <div class="comments-button">
-                <a class="btn btn-xs btn-default"
+                <a class="btn btn-sm btn-default"
                     data-toggle="tooltip" data-placement="top"
-                    onclick='toggleCommentsButtonInPicplayer(this); return false;'
+                    onclick='toggleCommentsButtonInPicplayer();'
                   ><i class="glyphicon glyphicon-comment" ></i> 评论</a>
               </div>
             </div>
@@ -634,11 +636,7 @@ function loadCommentMore() {
   picture_wall.loadCommentMore();
 }
 
-function toggleCommentsButtonInPicplayer(button) {
-  // console.debug('toggleCommentsButtonInPicplayer');
-  button = $(button);
-  button.toggleClass('active');
-
+function toggleCommentsButtonInPicplayer() {
   picture_wall.toggleComments();
   return false;
 }
@@ -654,6 +652,10 @@ function showOrHidePlayerControl() {
   }
   else {
     picture_wall.showPlayerControl();
+  }
+
+  if (picture_wall.isShowComments()) {
+    picture_wall.toggleComments();
   }
 }
 
@@ -753,6 +755,7 @@ function PictureWall() {
   var ablum_title = parent_div.find('.picplayer-content > .picplayer-control-header > .picplayer-control-title');
   var ablum_header = parent_div.find('.picplayer-content > .picplayer-control-header');
   var comments = parent_div.find('.picplayer-content > .picplayer-control-comments');
+  var comment_toggle_button = parent_div.find('.picplayer-content > .picplayer-control-comments > .comments-button > a');
 
   var commmentlist = parent_div.find('.picplayer-content > .picplayer-control-comments .ourshow-commmentlist');
   var comment_input = parent_div.find('.picplayer-content > .picplayer-control-comments .input-group input');
@@ -767,6 +770,7 @@ function PictureWall() {
   this._element_ablum_title = ablum_title;
   this._element_ablum_header = ablum_header;
   this._element_comments = comments;
+  this._element_comment_toggle_button = comment_toggle_button;
   this._element_commmentlist = commmentlist;
   this._element_comment_input = comment_input;
 
@@ -1146,7 +1150,9 @@ PictureWall.prototype.loadCommentMore = function () {
 
 PictureWall.prototype.toggleComments = function () {
   var comments = this._element_comments;
+  var toggle_button = this._element_comment_toggle_button;
   comments.toggleClass('picplayer-control-comments-show');
+  toggle_button.toggleClass('active');
 }
 
 PictureWall.prototype.isShowComments = function() {
