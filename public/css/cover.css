@@ -185,17 +185,23 @@ body {
   height: 100%; /* For at least Firefox */
 }
 
-.cover-inner:hover {
+.cover-inner-block:hover {
   cursor: pointer;
   background-color: rgba(0,0,0, 0.5);
 }
-.cover-inner:active {
+.cover-inner-block:active {
   background-color: rgba(0,0,0, 0.6);
   box-shadow: 2px 2px 9px rgba(0,0,0,0.7);
 }
-.cover-inner:hover > p,
-.cover-inner:hover > h1 {
+.cover-inner-block:hover > p,
+.cover-inner-block:hover > h1 {
   cursor: pointer;
+}
+
+.cover-inner-block {
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 0.5em;
+    box-shadow: 2px 2px 9px rgba(0,0,0,0.7);
 }
 
 .cover-inner {
@@ -208,10 +214,6 @@ body {
     -o-transform: translateX(50%) translateY(50%);
     -ms-transform: translateX(50%) translateY(50%);
     transform: translateX(50%) translateY(50%);
-
-    background-color: rgba(0,0,0,0.4);
-    border-radius: 0.5em;
-    box-shadow: 2px 2px 9px rgba(0,0,0,0.7);
 
     padding: 10px;
     max-height: 90%;

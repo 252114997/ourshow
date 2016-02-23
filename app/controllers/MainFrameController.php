@@ -55,7 +55,7 @@ class MainFrameController extends BaseController {
 
 		$param = array();
 		$param['path'] = storage_path().$item['path'];
-		//$param['path'] = iconv('utf-8','GBK',$param['path']);
+		// $param['path'] = iconv('utf-8','GBK',$param['path']);
 
 		$param['height'] = intval(Input::get('height', 770));
 		$param['width']  = intval(Input::get('width', 770));
@@ -74,7 +74,8 @@ class MainFrameController extends BaseController {
 			$user_info = tb_users::where('id', $user_id)->first();
 			if (null == $user_info) {
 				return View::make('login')
-					->with('deny_info', '需要邀请码啊喂！请点击 短信/微信/QQ 中的链接地址访问！');
+					->with('deny_info', '链接失效！')
+					->with('deny_user_id', $user_id);
 			}
 			// 使用免登录金牌
 			if (true !== UserAuthController::login($user_id, null)) {
@@ -91,7 +92,7 @@ class MainFrameController extends BaseController {
 
 			$error_info = UserAuthController::login($user_id, $token);
 			if (true !== $error_info) {
-				return Redirect::to('/login')
+				return Redirect::back()
 					->with('error_info', $error_info)
 					->withInput();
 			}

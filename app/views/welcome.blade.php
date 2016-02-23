@@ -51,7 +51,7 @@
     <div class="site-background site-background-back"  ></div>
 
     <div class="cover-continer" >
-          <div class="cover-inner" onclick="doShuffleBackground();" >
+          <div class="cover-inner cover-inner-block" onclick="doShuffleBackground();" >
             <h1 class="cover-heading">见证爱情</h1>
             <p class="lead">二十年擦肩而过</p>
             <p class="lead">五年朝夕相伴</p>

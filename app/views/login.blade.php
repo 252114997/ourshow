@@ -9,9 +9,6 @@
 
 @section('body')
 
-    <div class="site-background filter-blur">
-    </div>
-
     <div class="cover-continer" >
 
           <div class="cover-inner" >
@@ -21,12 +18,10 @@
             <form class="form-horizontal" >
               <div class="form-group">
                 <div class="col-sm-12">
-                    <h2 class="text-danger">
-                      需要邀请码啊喂！
+                    <h2 class="text-primary">
+                      {{ $deny_info }}
                     </h2>
-                    <h3 class="text-danger">
-                      请点击 短信/微信/QQ 中的链接地址访问！
-                    </h3>
+                    <p class="text-muted">{{ $deny_user_id }}</p>
                 </div>
               </div>
             </form>
