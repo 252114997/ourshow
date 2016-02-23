@@ -669,7 +669,7 @@ function showPictureWall(ablum_id, ablum_title) {
 
 function showPictureWallNext(e) {
   // console.debug('showPictureWallNext');
-  picture_wall.next(1);
+  picture_wall.next(0.2);
   picture_wall.showPlayerControl();
 
   e.stopPropagation();
@@ -677,7 +677,7 @@ function showPictureWallNext(e) {
 }
 function showPictureWallLast(e) {
   // console.debug('showPictureWallLast');
-  picture_wall.last(1);
+  picture_wall.last(0.2);
   picture_wall.showPlayerControl();
 
   e.stopPropagation();
