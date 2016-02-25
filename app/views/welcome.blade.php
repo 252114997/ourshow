@@ -173,10 +173,10 @@
             <div class="picplayer-control-comments" >
               <div class="text-center picplayer-control-commmentlist-wrap">
                 <div class="input-group">
-                    <input type="text" class="form-control input-sm" placeholder="我也说一句..." name='comment'
-                      onkeydown="if (event.keyCode == 13) $(this).next('span').click();" />
+                    <textarea row="3" class="form-control" placeholder="我也说一句..." name='comment'
+                     ></textarea>
                     <span class="input-group-btn" onclick="addComments();">
-                      <a class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span>评论</a>
+                      <a class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-comment"></span>评论</a>
                     </span>
                 </div>
 
@@ -758,7 +758,7 @@ function PictureWall() {
   var comment_toggle_button = parent_div.find('.picplayer-content > .picplayer-control-comments > .comments-button > a');
 
   var commmentlist = parent_div.find('.picplayer-content > .picplayer-control-comments .ourshow-commmentlist');
-  var comment_input = parent_div.find('.picplayer-content > .picplayer-control-comments .input-group input');
+  var comment_textarea = parent_div.find('.picplayer-content > .picplayer-control-comments .input-group textarea');
 
   this._element_other_divs = other_divs;
   this._element_parent_div = parent_div;
@@ -772,7 +772,7 @@ function PictureWall() {
   this._element_comments = comments;
   this._element_comment_toggle_button = comment_toggle_button;
   this._element_commmentlist = commmentlist;
-  this._element_comment_input = comment_input;
+  this._element_comment_textarea = comment_textarea;
 
   this._picture_array = [];
   this._picture_info_array = [];
@@ -1069,7 +1069,7 @@ PictureWall.prototype.reloadComments = function () {
 PictureWall.prototype.addComments = function () {
   var this_ptr = this;
   var ablum_id = this._ablum_id;
-  var comment_input = this._element_comment_input;
+  var comment_input = this._element_comment_textarea;
   var comment = comment_input.val();
   comment_input.focus();
 
