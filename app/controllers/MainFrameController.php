@@ -90,6 +90,11 @@ class MainFrameController extends BaseController {
 			$token = Input::get('token');
 			$user_id = Cookie::get('user_id');
 
+			self::recordAccessLog(array(
+				'token' => $token,
+				'user_id' => $user_id
+			));
+
 			$error_info = UserAuthController::login($user_id, $token);
 			if (true !== $error_info) {
 				return Redirect::back()
@@ -100,6 +105,20 @@ class MainFrameController extends BaseController {
 		}
 
 		return Response::make('此页面只能用GET/POST方法访问!', 404);
+	}
+
+	static public function recordAccessLog($extend_info) {
+		$extend_info = json_encode($extend_info);
+		$client_ip = Request::getClientIp();
+		$request_url = Request::url();
+		$user_agent = Request::header('User-Agent');
+		tb_access_log::create(array(
+			'client_ip' => $client_ip, 
+			'user_agent' => $user_agent,
+			'extend_info' => $extend_info,
+			'request_url' => $request_url
+		));
+
 	}
 
 	public function getAblums() {
@@ -135,6 +154,12 @@ class MainFrameController extends BaseController {
 		$ablums = $this->getAblums();
 		$backgrounds = $this->getAllBackgrounds();
 		$random_index = rand(0, count($backgrounds)-1);
+
+		$user_id = Cookie::get('user_id');
+		self::recordAccessLog(array(
+			'user_id' => $user_id
+		));
+
 		// 随机播放图片
 		return View::make('welcome')
 			->with(
