@@ -53,7 +53,7 @@
     <div class="cover-continer" >
           <div class="cover-inner cover-inner-block" onclick="doShuffleBackground();" >
             <h1 class="cover-heading">一生所爱</h1>
-            <p class="lead">感谢一直在陪伴身边的你们</p>
+            <p class="lead">感谢一直陪伴在身边的你们</p>
             <p class="lead">尤其感谢出现在我生活中的你</p>
             <p class="lead">愿年迈蹒跚，阳光和你仍在</p>
           </div>

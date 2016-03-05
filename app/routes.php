@@ -11,12 +11,12 @@
 |
 */
 
-
-Route::any('/carousel', 'MainFrameController@carousel');
-Route::any('/testp', 'MainFrameController@testp');
-
-
+// Route::any('/carousel', 'MainFrameController@carousel');
+// Route::any('/testp', 'MainFrameController@testp');
 Route::any('/login', 'MainFrameController@login');
+Route::get('/', function() {
+	return Redirect::to('/welcome');
+});
 
 //
 // 所有需要账号验证的页面
